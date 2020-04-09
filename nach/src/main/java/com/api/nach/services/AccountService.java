@@ -1,10 +1,15 @@
 package com.api.nach.services;
 
 import java.io.StringReader;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,6 +50,15 @@ public class AccountService {
 	String serviceName1 = "GetPanDtls";
 	String serviceName2 = "GetAccHolder";
 	String serviceName3 = "GetAccStatus";
+	String respContent1 = "";
+	String respContent2="";
+	String respContent3="";
+	
+	private Map<String, String> fiMap = new LinkedHashMap<String, String>();
+	private ArrayList<String> fiMsgList = new ArrayList<String>();
+	private ArrayList<String> list1 = new ArrayList<String>();
+	private ArrayList<String> list2 = new ArrayList<String>();
+	private ArrayList<String> list3 = new ArrayList<String>();
 	
 	
 	public String getPanDtls(String request) {
@@ -121,8 +135,51 @@ public class AccountService {
 			e.printStackTrace();
 		}
 		
+		//getDataFi(acctNo);
+		fiMap.clear();
+		fiMap.put("Nayan", "asdjkahskdjh");
+		fiMap.put("Vaibhav", "agjshdgjasgdjhgj");
+		fiMap.put("Aniket", "agjshdgjasasdgdjhgj");
 		
-		return "data added";
+		Set s1 = fiMap.keySet();
+		Set s2 = fiMap.entrySet();
+		
+		for(Map.Entry mE:fiMap.entrySet()) {
+			
+			list1.add((String)mE.getKey());
+			list2.add((String)mE.getValue());
+		}
+		
+		if(fiMap.size()>1) {
+			
+			for(int i=0;i<list1.size();i++) {
+				
+				respContent1 = "<AccHolder pan=\""+list2.get(i)+"\"name=\""+list1.get(i)+"\"/>\r\n";
+				list3.add(respContent1);
+				respContent2 = respContent2 + list3.get(i);
+				
+			}
+		}
+		else {
+			
+			respContent2 = "<AccHolder pan=\""+list2.get(0)+"\"name=\""+list1.get(0)+"\"/>\r\n";
+		}
+		
+		respContent3 = "{'Source':'"+destValue+"','Service':'"+serviceName1+"','Type':'Response','Message':'<ach:GetPanDtlsResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
+				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
+				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
+				"  <Request id=\""+reqId+"\" refUrl=\"\" type=\"DETAILS_ENQ\"/>\r\n" + 
+				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
+				"  <Resp ts=\""+respTimestamp+"\" result=\"SUCCESS\" errCode=\"\" rejectedBy=\"\" />\r\n" + 
+				"  <RespData>\r\n" + 
+				"<AccHolderList>\r\n" + 
+				respContent2+
+				"	</AccHolderList>\r\n" + 
+				"</RespData>\r\n" + 
+				"</ach:GetPanDtlsResp>'}";
+		
+		return respContent3;
 		
 		
 	}
@@ -284,6 +341,56 @@ public class AccountService {
 		
 		return "data added";
 		
+		
+	}
+	
+	public void getDataFi(String acctNo) {
+		
+		String custPan = "";
+		String custName = "";
+		String fiMsg= "";
+		String fiUrl = "";
+		String acctTypeFi = "";
+		String ifscCodeFi = "";
+		try {
+			
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(new URL(fiUrl).openStream());
+			document.getDocumentElement().normalize();
+			
+			fiMsg = document.getElementsByTagName("msg").item(0).getTextContent();
+			
+			NodeList nList = document.getElementsByTagName("acctHolderDtls");
+			System.out.println("Nodelist length is "+nList.getLength());
+			
+			acctTypeFi = document.getElementsByTagName("accttype").item(0).getTextContent();
+			ifscCodeFi = document.getElementsByTagName("brIFSCCode").item(0).getTextContent();
+			
+			if(nList.getLength()>0) {
+				
+				for(int i=0;i< nList.getLength();i++) {
+					
+					Node node = nList.item(i);
+					
+					Element element = (Element) node;
+					custName = document.getElementsByTagName("custName").item(i).getTextContent();
+					custPan = document.getElementsByTagName("custPAN").item(i).getTextContent();
+					
+					fiMap.put(custName, custPan);
+					
+				}
+			}
+			
+			else {
+				
+				fiMsgList.add(fiMsg);
+			}
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		
 	}
 	
