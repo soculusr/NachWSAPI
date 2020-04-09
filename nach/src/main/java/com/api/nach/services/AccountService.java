@@ -134,9 +134,9 @@ public class AccountService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		//getDataFi(acctNo);
 		fiMap.clear();
+		//getDataFi(acctNo);
+		
 		fiMap.put("Nayan", "asdjkahskdjh");
 		fiMap.put("Vaibhav", "agjshdgjasgdjhgj");
 		fiMap.put("Aniket", "agjshdgjasasdgdjhgj");
