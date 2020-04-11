@@ -11,6 +11,6 @@ import com.api.nach.models.Response1;
 public interface ResponseRepository1 extends JpaRepository<Response1, Integer>{
 	
 	@Query(value = "SELECT * from response where service_name='GetPanDtls'", nativeQuery = true)
-	  List<Request1> findByServiceName();
+	  List<Response1> findByServiceName();
 
 }

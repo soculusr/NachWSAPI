@@ -77,6 +77,7 @@ public class AccountService {
 	String respContent8="";
 	String respContent9="";
 	String acctTypeFi = "";
+	String fiMsg= "";
 	
 	private Map<String, String> fiMap1 = new LinkedHashMap<String, String>();
 	private Map<String, String> fiMap2 = new LinkedHashMap<String, String>();
@@ -122,9 +123,9 @@ public class AccountService {
 		String reqId="";
 		String reqType="";
 		String reqTimestamp = "";
-		String respContent1 ="";
-		String respContent2="";
-		String respContent3="";
+		respContent1 ="";
+		respContent2="";
+		respContent3="";
 		fiMap1.clear();
 		list1.clear();
 		list2.clear();
@@ -198,6 +199,7 @@ public class AccountService {
 		fiMap1.put("Vaibhav", "agjshdgjasgdjhgj");
 		fiMap1.put("Aniket", "agjshdgjasasdgdjhgj");
 		
+		
 		Set s1 = fiMap1.keySet();
 		Set s2 = fiMap1.entrySet();
 		
@@ -245,8 +247,9 @@ public class AccountService {
 		responseRepository1.save(response1);
 		
 		
-		//return respContent3;
-		return "not found";
+		
+		return respContent3;
+		//return "not found";
 		
 		
 	}
@@ -275,6 +278,9 @@ public class AccountService {
 		fiMap2.clear();
 		list4.clear();
 		list5.clear();
+		respContent4="";
+		respContent5="";
+		respContent6="";
 		
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -338,7 +344,7 @@ public class AccountService {
 		fiMap2.put("Nayan", "asdjkahskdjh");
 		fiMap2.put("Vaibhav", "agjshdgjasgdjhgj");
 		fiMap2.put("Aniket", "agjshdgjasasdgdjhgj");
-		
+		logger.info(list4.toString());
 		for(Map.Entry mE:fiMap2.entrySet()) {
 			
 			list4.add((String)mE.getKey());
@@ -349,15 +355,17 @@ public class AccountService {
 			
 			for(int i=0;i<list4.size();i++) {
 				
-				respContent4 = "<AccHolder name=\""+list4.get(i)+"\" />";
-				list5.add(respContent1);
+				logger.info("Account holder "+ list4.get(i));
+				
+				respContent4 = "<AccHolder name=\""+list4.get(i)+"\" />\r\n";
+				list5.add(respContent4);
 				respContent5 = respContent5 + list5.get(i);
 				
 			}
 		}
 		else {
 			
-			respContent5 = "<AccHolder name=\""+list4.get(0)+"\" />";
+			respContent5 = "<AccHolder name=\""+list4.get(0)+"\" />\r\n";
 		}
 		
 		respContent6 = "{'Source':'"+destValue+"','Service':'"+serviceName2+"','Type':'Response','Message':'<ach:GetAccHolderResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
@@ -375,12 +383,12 @@ public class AccountService {
 				"</ach:GetAccHolderResp>'}";
 		
 		
-		response2.setId(accountRepository1.findByReqId(reqId));
+		response2.setId(accountRepository2.findByReqId(reqId));
 		response2.setServicename(serviceName1);
 		response2.setResptimestamp(respTimestamp);
 		response2.setRqstid(reqId);
 		response2.setNpcirefid(npciRefId);
-		response2.setRespcontent(respContent3);
+		response2.setRespcontent(respContent6);
 		responseRepository2.save(response2);
 		
 		
@@ -407,6 +415,8 @@ public class AccountService {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
 		String requestData = request;
+		respContent7="";
+		respContent8="";
 		
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -466,6 +476,8 @@ public class AccountService {
 		
 		//getDataFi(acctNo);
 		
+		acctTypeFi = "SBA";
+		
 		respContent7 = "<Account type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" />\r\n";
 		
 		respContent8 = "{'Source':'"+destValue+"','Service':'"+serviceName3+"','Type':'Response','Message':'<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
@@ -480,12 +492,12 @@ public class AccountService {
 				"</RespData>\r\n" + 
 				"</ach:GetAccStatusResp>'}";
 		
-		response3.setId(accountRepository1.findByReqId(reqId));
+		response3.setId(accountRepository3.findByReqId(reqId));
 		response3.setServicename(serviceName1);
 		response3.setResptimestamp(respTimestamp);
 		response3.setRqstid(reqId);
 		response3.setNpcirefid(npciRefId);
-		response3.setRespcontent(respContent3);
+		response3.setRespcontent(respContent8);
 		responseRepository3.save(response3);
 		
 		
@@ -500,7 +512,7 @@ public class AccountService {
 		
 		String custPan = "";
 		String custName = "";
-		String fiMsg= "";
+		
 		String fiUrl = "";
 		
 		String ifscCodeFi = "";
@@ -548,6 +560,7 @@ public class AccountService {
 		}
 		
 	}
+	
 	
 	
 }

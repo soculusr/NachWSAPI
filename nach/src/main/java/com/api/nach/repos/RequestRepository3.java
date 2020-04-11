@@ -13,6 +13,9 @@ import com.api.nach.models.Request3;
 public interface RequestRepository3 extends JpaRepository<Request3, Integer>{
 	
 	@Query(value = "SELECT * from request where service_name='GetAccStatus'", nativeQuery = true)
-	  List<Request1> findByServiceName();
+	  List<Request3> findByServiceName();
+	
+	@Query(value = "SELECT unique_id from request where request_id=?1", nativeQuery = true)
+	int findByReqId(String rqstId);
 
 }

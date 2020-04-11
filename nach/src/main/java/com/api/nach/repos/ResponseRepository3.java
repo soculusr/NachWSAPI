@@ -13,6 +13,6 @@ import com.api.nach.models.Response3;
 public interface ResponseRepository3 extends JpaRepository<Response3, Integer>{
 	
 	@Query(value = "SELECT * from response where service_name='GetAccStatus'", nativeQuery = true)
-	  List<Request1> findByServiceName();
+	  List<Response3> findByServiceName();
 
 }

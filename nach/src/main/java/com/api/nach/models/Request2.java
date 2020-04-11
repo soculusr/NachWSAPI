@@ -2,6 +2,8 @@ package com.api.nach.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -14,17 +16,18 @@ public class Request2 {
 	
 	@Id
 	@Column(name="unique_id")
-	private int id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id2;
 	@Column(name="service_name")
-	private String servicename;
+	private String servicename2;
 	@Column(name="request_timestamp")
-	private String rqsttimestamp;
+	private String rqsttimestamp2;
 	@Column(name="request_id")
-	private String rqstid;
+	private String rqstid2;
 	@Column(name="npciref_id")
-	private String npcirefid;
+	private String npcirefid2;
 	@Column(name="request_content")
-	private String rqstcontent;
+	private String rqstcontent2;
 	
 	
 	
@@ -35,40 +38,40 @@ public class Request2 {
 	
 	
 	public int getId() {
-		return id;
+		return id2;
 	}
 	public void setId(int id) {
-		this.id = id;
+		this.id2 = id;
 	}
 	public String getServicename() {
-		return servicename;
+		return servicename2;
 	}
 	public void setServicename(String servicename) {
-		this.servicename = servicename;
+		this.servicename2 = servicename;
 	}
 	public String getRqsttimestamp() {
-		return rqsttimestamp;
+		return rqsttimestamp2;
 	}
 	public void setRqsttimestamp(String rqsttimestamp) {
-		this.rqsttimestamp = rqsttimestamp;
+		this.rqsttimestamp2 = rqsttimestamp;
 	}
 	public String getRqstid() {
-		return rqstid;
+		return rqstid2;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid = rqstid;
+		this.rqstid2 = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid;
+		return npcirefid2;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid = npcirefid;
+		this.npcirefid2 = npcirefid;
 	}
 	public String getRqstcontent() {
-		return rqstcontent;
+		return rqstcontent2;
 	}
 	public void setRqstcontent(String rqstcontent) {
-		this.rqstcontent = rqstcontent;
+		this.rqstcontent2 = rqstcontent;
 	}
 
 }

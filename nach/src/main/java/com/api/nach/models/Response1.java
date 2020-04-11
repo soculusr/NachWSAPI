@@ -2,6 +2,8 @@ package com.api.nach.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -14,17 +16,17 @@ public class Response1 {
 	
 	@Id
 	@Column(name="unique_id")
-	private int id;
+	private int id4;
 	@Column(name="service_name")
-	private String servicename;
+	private String servicename4;
 	@Column(name="response_timestamp")
-	private String resptimestamp;
+	private String resptimestamp4;
 	@Column(name="request_id")
-	private String rqstid;
+	private String rqstid4;
 	@Column(name="npciref_id")
-	private String npcirefid;
+	private String npcirefid4;
 	@Column(name="response_content")
-	private String respcontent;
+	private String respcontent4;
 	
 	
 	
@@ -33,40 +35,40 @@ public class Response1 {
 	}
 	
 	public int getId() {
-		return id;
+		return id4;
 	}
 	public void setId(int id) {
-		this.id = id;
+		this.id4 = id;
 	}
 	public String getServicename() {
-		return servicename;
+		return servicename4;
 	}
 	public void setServicename(String servicename) {
-		this.servicename = servicename;
+		this.servicename4 = servicename;
 	}
 	public String getResptimestamp() {
-		return resptimestamp;
+		return resptimestamp4;
 	}
 	public void setResptimestamp(String resptimestamp) {
-		this.resptimestamp = resptimestamp;
+		this.resptimestamp4 = resptimestamp;
 	}
 	public String getRqstid() {
-		return rqstid;
+		return rqstid4;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid = rqstid;
+		this.rqstid4 = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid;
+		return npcirefid4;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid = npcirefid;
+		this.npcirefid4 = npcirefid;
 	}
 	public String getRespcontent() {
-		return respcontent;
+		return respcontent4;
 	}
 	public void setRespcontent(String respcontent) {
-		this.respcontent = respcontent;
+		this.respcontent4 = respcontent;
 	}
 	
 	
