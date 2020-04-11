@@ -14,6 +14,8 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.hibernate.annotations.common.util.impl.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -30,39 +32,86 @@ import org.xml.sax.InputSource;
 import com.api.nach.models.Request1;
 import com.api.nach.models.Request2;
 import com.api.nach.models.Request3;
-import com.api.nach.repos.AccountRepository1;
-import com.api.nach.repos.AccountRepository2;
-import com.api.nach.repos.AccountRepository3;
+import com.api.nach.models.Response1;
+import com.api.nach.models.Response2;
+import com.api.nach.models.Response3;
+import com.api.nach.repos.RequestRepository1;
+import com.api.nach.repos.RequestRepository2;
+import com.api.nach.repos.RequestRepository3;
+import com.api.nach.repos.ResponseRepository1;
+import com.api.nach.repos.ResponseRepository2;
+import com.api.nach.repos.ResponseRepository3;
 
 @Component
 public class AccountService {
 	
+
+	@Autowired
+	private RequestRepository1 accountRepository1;
 	
 	@Autowired
-	private AccountRepository1 accountRepository1;
+	private RequestRepository2 accountRepository2;
 	
 	@Autowired
-	private AccountRepository2 accountRepository2;
+	private RequestRepository3 accountRepository3;
 	
 	@Autowired
-	private AccountRepository3 accountRepository3;
+	private ResponseRepository1 responseRepository1;
+	
+	@Autowired
+	private ResponseRepository2 responseRepository2;
+	
+	@Autowired
+	private ResponseRepository3 responseRepository3;
 	
 	String serviceName1 = "GetPanDtls";
 	String serviceName2 = "GetAccHolder";
 	String serviceName3 = "GetAccStatus";
-	String respContent1 = "";
+	String respContent1 ="";
 	String respContent2="";
 	String respContent3="";
+	String respContent4 ="";
+	String respContent5="";
+	String respContent6="";
+	String respContent7 ="";
+	String respContent8="";
+	String respContent9="";
+	String acctTypeFi = "";
 	
-	private Map<String, String> fiMap = new LinkedHashMap<String, String>();
+	private Map<String, String> fiMap1 = new LinkedHashMap<String, String>();
+	private Map<String, String> fiMap2 = new LinkedHashMap<String, String>();
+	private Map<String, String> fiMap3 = new LinkedHashMap<String, String>();
+	private Map<String, String> acctTypesFi = new LinkedHashMap<String, String>();
+	
+	public AccountService() {
+		
+		acctTypesFi.put("SBA", "T651");
+		acctTypesFi.put("CAA", "T652");
+		acctTypesFi.put("CCA", "T653");
+		acctTypesFi.put("ODA", "T654");
+		
+	}
+
 	private ArrayList<String> fiMsgList = new ArrayList<String>();
 	private ArrayList<String> list1 = new ArrayList<String>();
 	private ArrayList<String> list2 = new ArrayList<String>();
 	private ArrayList<String> list3 = new ArrayList<String>();
+	private ArrayList<String> list4 = new ArrayList<String>();
+	private ArrayList<String> list5 = new ArrayList<String>();
+	private ArrayList<String> list6 = new ArrayList<String>();
+	private ArrayList<String> list7 = new ArrayList<String>();
+	private ArrayList<String> list8 = new ArrayList<String>();
+	private ArrayList<String> list9 = new ArrayList<String>();
+	
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountService.class);
 	
 	
 	public String getPanDtls(String request) {
+		
+		
+		
 		Request1 request1 = new Request1();
+		Response1 response1 = new Response1();
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -73,6 +122,13 @@ public class AccountService {
 		String reqId="";
 		String reqType="";
 		String reqTimestamp = "";
+		String respContent1 ="";
+		String respContent2="";
+		String respContent3="";
+		fiMap1.clear();
+		list1.clear();
+		list2.clear();
+		list3.clear();
 		//System.out.println("request data is" +request);
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -87,7 +143,7 @@ public class AccountService {
 			builder = factory.newDocumentBuilder();
 			Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
 			Element root = document.getDocumentElement();
-			System.out.println("Root node is "+root.getNodeName());
+			logger.info("Root node is "+root.getNodeName());
 			
 			NodeList nList1 = document.getElementsByTagName("Detail");
 			NodeList nList2 = document.getElementsByTagName("NpciRefId");
@@ -96,7 +152,8 @@ public class AccountService {
 			NodeList nList5 = document.getElementsByTagName("Request");
 			NodeList nList6 = document.getElementsByTagName("Head");
 			
-			System.out.println("Node list length "+nList1.getLength());
+		
+			logger.info("Node list length "+nList1.getLength());
 			
 			for(int i=0;i<nList1.getLength();i++) {
 				
@@ -132,25 +189,25 @@ public class AccountService {
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Exception", e);
 		}
-		fiMap.clear();
+		
 		//getDataFi(acctNo);
 		
-		fiMap.put("Nayan", "asdjkahskdjh");
-		fiMap.put("Vaibhav", "agjshdgjasgdjhgj");
-		fiMap.put("Aniket", "agjshdgjasasdgdjhgj");
+		fiMap1.put("Nayan", "asdjkahskdjh");
+		fiMap1.put("Vaibhav", "agjshdgjasgdjhgj");
+		fiMap1.put("Aniket", "agjshdgjasasdgdjhgj");
 		
-		Set s1 = fiMap.keySet();
-		Set s2 = fiMap.entrySet();
+		Set s1 = fiMap1.keySet();
+		Set s2 = fiMap1.entrySet();
 		
-		for(Map.Entry mE:fiMap.entrySet()) {
+		for(Map.Entry mE:fiMap1.entrySet()) {
 			
 			list1.add((String)mE.getKey());
 			list2.add((String)mE.getValue());
 		}
 		
-		if(fiMap.size()>1) {
+		if(fiMap1.size()>1) {
 			
 			for(int i=0;i<list1.size();i++) {
 				
@@ -179,19 +236,33 @@ public class AccountService {
 				"</RespData>\r\n" + 
 				"</ach:GetPanDtlsResp>'}";
 		
-		return respContent3;
+		response1.setId(accountRepository1.findByReqId(reqId));
+		response1.setServicename(serviceName1);
+		response1.setResptimestamp(respTimestamp);
+		response1.setRqstid(reqId);
+		response1.setNpcirefid(npciRefId);
+		response1.setRespcontent(respContent3);
+		responseRepository1.save(response1);
+		
+		
+		//return respContent3;
+		return "not found";
 		
 		
 	}
 	
 	public String getAcctHolderName(String request) {
 		Request2 request2 = new Request2();
+		
+		
+		Response2 response2 = new Response2(); 
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
 		String sourceName = "";
 		String destValue = "";
 		String destName = "";
+		String ifscCode = "";
 		String npciRefId = "";
 		String reqId="";
 		String reqType="";
@@ -201,6 +272,9 @@ public class AccountService {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
 		String requestData = request;
+		fiMap2.clear();
+		list4.clear();
+		list5.clear();
 		
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -238,6 +312,8 @@ public class AccountService {
 				Element element6 = (Element) node6;
 				
 				acctNo = element1.getAttribute("accNo");
+				if(xmlContent.contains("GetAccStatus"))
+					ifscCode = element1.getAttribute("ifsc");
 				npciRefId = element2.getAttribute("value");
 				sourceValue = element3.getAttribute("value");
 				sourceName = element3.getAttribute("name");
@@ -258,14 +334,64 @@ public class AccountService {
 			e.printStackTrace();
 		}
 		
+		//getDataFi(acctNo);
+		fiMap2.put("Nayan", "asdjkahskdjh");
+		fiMap2.put("Vaibhav", "agjshdgjasgdjhgj");
+		fiMap2.put("Aniket", "agjshdgjasasdgdjhgj");
 		
-		return "data added";
+		for(Map.Entry mE:fiMap2.entrySet()) {
+			
+			list4.add((String)mE.getKey());
+			
+		}
+		
+		if(fiMap2.size()>1) {
+			
+			for(int i=0;i<list4.size();i++) {
+				
+				respContent4 = "<AccHolder name=\""+list4.get(i)+"\" />";
+				list5.add(respContent1);
+				respContent5 = respContent5 + list5.get(i);
+				
+			}
+		}
+		else {
+			
+			respContent5 = "<AccHolder name=\""+list4.get(0)+"\" />";
+		}
+		
+		respContent6 = "{'Source':'"+destValue+"','Service':'"+serviceName2+"','Type':'Response','Message':'<ach:GetAccHolderResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
+				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
+				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
+				"  <Request id=\""+reqId+"\" refUrl=\"\" type=\"DETAILS_ENQ\"/>\r\n" + 
+				"  <Resp ts=\""+respTimestamp+"\" result=\"SUCCESS\" errCode=\"\" rejectedBy=\"\" />\r\n" + 
+				"  <RespData>\r\n" + 
+				"  <AccHolderList>\r\n" + 
+				respContent5+
+				"	</AccHolderList>\r\n" + 
+				"  </RespData>\r\n" + 
+				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
+				"</ach:GetAccHolderResp>'}";
+		
+		
+		response2.setId(accountRepository1.findByReqId(reqId));
+		response2.setServicename(serviceName1);
+		response2.setResptimestamp(respTimestamp);
+		response2.setRqstid(reqId);
+		response2.setNpcirefid(npciRefId);
+		response2.setRespcontent(respContent3);
+		responseRepository2.save(response2);
+		
+		
+		return respContent6;
 		
 		
 	}
 	
 	public String getAcctStatus(String request) {
 		Request3 request3 = new Request3();
+		Response3 response3 = new Response3();
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -338,8 +464,34 @@ public class AccountService {
 			e.printStackTrace();
 		}
 		
+		//getDataFi(acctNo);
 		
-		return "data added";
+		respContent7 = "<Account type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" />\r\n";
+		
+		respContent8 = "{'Source':'"+destValue+"','Service':'"+serviceName3+"','Type':'Response','Message':'<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
+				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
+				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
+				"  <Request id=\""+reqId+"\" refUrl=\"\" type=\"DETAILS_ENQ\"/>\r\n" + 
+				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
+				"  <Resp ts=\""+respTimestamp+"\" result=\"SUCCESS\" errCode=\"\" rejectedBy=\"\"/>\r\n" + 
+				"<RespData>\r\n" + 
+				respContent7+ 
+				"</RespData>\r\n" + 
+				"</ach:GetAccStatusResp>'}";
+		
+		response3.setId(accountRepository1.findByReqId(reqId));
+		response3.setServicename(serviceName1);
+		response3.setResptimestamp(respTimestamp);
+		response3.setRqstid(reqId);
+		response3.setNpcirefid(npciRefId);
+		response3.setRespcontent(respContent3);
+		responseRepository3.save(response3);
+		
+		
+		
+		
+		return respContent8;
 		
 		
 	}
@@ -350,8 +502,10 @@ public class AccountService {
 		String custName = "";
 		String fiMsg= "";
 		String fiUrl = "";
-		String acctTypeFi = "";
+		
 		String ifscCodeFi = "";
+		fiMap1.clear();
+		fiMap2.clear();
 		try {
 			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -377,7 +531,8 @@ public class AccountService {
 					custName = document.getElementsByTagName("custName").item(i).getTextContent();
 					custPan = document.getElementsByTagName("custPAN").item(i).getTextContent();
 					
-					fiMap.put(custName, custPan);
+					fiMap1.put(custName, custPan);
+					fiMap2.put(custName, ifscCodeFi);
 					
 				}
 			}

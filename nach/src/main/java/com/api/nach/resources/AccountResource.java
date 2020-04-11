@@ -10,8 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.nach.exceptions.AcctNotFoundException;
 import com.api.nach.models.Request1;
-import com.api.nach.repos.AccountRepository1;
+import com.api.nach.repos.RequestRepository1;
+import com.api.nach.repos.RequestRepository2;
+import com.api.nach.repos.RequestRepository3;
+import com.api.nach.repos.ResponseRepository1;
+import com.api.nach.repos.ResponseRepository2;
+import com.api.nach.repos.ResponseRepository3;
 import com.api.nach.services.AccountService;
 
 
@@ -20,13 +26,33 @@ import com.api.nach.services.AccountService;
 public class AccountResource {
 	
 	@Autowired
-	private AccountRepository1 accountRepository1;
+	private RequestRepository1 requestRepository1;
+	
+	@Autowired
+	private RequestRepository2 requestRepository2;
+	
+	@Autowired
+	private RequestRepository3 requestRepository3;
+	
+	@Autowired
+	private ResponseRepository1 responseRepository1;
+	
+	@Autowired
+	private ResponseRepository2 responseRepository2;
+	
+	@Autowired
+	private ResponseRepository3 responseRepository3;
 	
 	@Autowired
 	AccountService accountService;
 	
 	@PostMapping("/GetPanDtls")
 	public String getPanDtlsRqst(@RequestBody String acctinfo) {
+		
+		String respData = accountService.getPanDtls(acctinfo);
+		
+		if(respData.equals("not found"))
+			throw new AcctNotFoundException("Account Not Found");
 		
 		return accountService.getPanDtls(acctinfo);
 	}
@@ -44,19 +70,44 @@ public class AccountResource {
 	}
 	
 	
-
-	
 	@GetMapping("/GetAllRequest1")
 	public List<Request1> getAllRequest1(){
 	
-		return accountRepository1.findByServiceName();
+		return requestRepository1.findByServiceName();
 	}
 	
-	@GetMapping("/add")
+	@GetMapping("/GetAllRequest2")
+	public List<Request1> getAllRequest2(){
 	
-	public String addData(String request) {
-		
-		return accountService.getPanDtls(request);
+		return requestRepository2.findByServiceName();
 	}
+	
+	@GetMapping("/GetAllRequest3")
+	public List<Request1> getAllRequest3(){
+	
+		return requestRepository3.findByServiceName();
+	}
+	
+	@GetMapping("/GetAllResponse1")
+	public List<Request1> getAllResponse1(){
+	
+		return responseRepository1.findByServiceName();
+	}
+	
+	@GetMapping("/GetAllResponse2")
+	public List<Request1> getAllResponse2(){
+	
+		return responseRepository2.findByServiceName();
+	}
+	
+	@GetMapping("/GetAllResponse3")
+	public List<Request1> getAllResponse3(){
+	
+		return responseRepository3.findByServiceName();
+	}
+	
+	
+	
+	
 
 }
