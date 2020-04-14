@@ -561,6 +561,51 @@ public class AccountService {
 		
 	}
 	
+	public String getPanDtlsAck() {
+		
+		Date date = Calendar.getInstance().getTime();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String ackTimestamp = dateFormat.format(date);
+		String ackData = "{'Source':'Demo','Service':'GetPanDtls','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+				"<NpciRefId value=\"\"/>\r\n"+
+				"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
+				"</nachapi:GatewayAck>'}";
+		
+		return ackData;
+			
+		
+	}
+	
+	public String getAcctHolderAck() {
+		
+		Date date = Calendar.getInstance().getTime();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String ackTimestamp = dateFormat.format(date);
+		String ackData = "{'Source':'Demo','Service':'GetAccHolder','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+				"<NpciRefId value=\"\"/>\r\n"+
+				"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
+				"</nachapi:GatewayAck>'}";
+		
+		return ackData;
+			
+		
+	}
+
+	public String getAcctStatusAck() {
+	
+	Date date = Calendar.getInstance().getTime();
+	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	String ackTimestamp = dateFormat.format(date);
+	String ackData = "{'Source':'Demo','Service':'GetAccStatus','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+			"<NpciRefId value=\"\"/>\r\n"+
+			"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
+			"</nachapi:GatewayAck>'}";
+	
+	return ackData;
+		
+	
+}
+	
 	
 	
 }

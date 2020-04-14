@@ -4,10 +4,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.nach.exceptions.AcctNotFoundException;
@@ -34,6 +37,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class AccountResource {
 	
 	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
+	private static final String TOPIC = "kafka_demo";
+	
+	@Autowired
 	private RequestRepository1 requestRepository1;
 	
 	@Autowired
@@ -57,9 +65,14 @@ public class AccountResource {
 	@Operation(summary = "Pan Details Request", description = "It will give acct no and PAN details", tags = { "GetPanDtls" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetPanDtls")
+	@ResponseStatus(HttpStatus.ACCEPTED)
 	public String getPanDtlsRqst(@RequestBody String acctinfo) {
 		
-		String respData = accountService.getPanDtls(acctinfo);
+		
+		kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
+		String respData = accountService.getPanDtlsAck();
+		
+		
 		
 		if(respData.equals("not found"))
 			throw new AcctNotFoundException("Account Not Found");
@@ -70,9 +83,11 @@ public class AccountResource {
 	@Operation(summary = "Account Holder Request", description = "It will give acct holder name", tags = { "GetAccHolder" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccHolder")
+	@ResponseStatus(HttpStatus.ACCEPTED)
 	public String getAcctHolderRqst(@RequestBody String acctinfo) {
 		
-		String respData = accountService.getAcctHolderName(acctinfo);
+		kafkaTemplate.send(TOPIC, accountService.getAcctHolderName(acctinfo));
+		String respData = accountService.getAcctHolderAck();
 		if(respData.equals("not found"))
 			throw new AcctNotFoundException("Account Not Found");
 		
@@ -82,9 +97,10 @@ public class AccountResource {
 	@Operation(summary = "Account Status Request", description = "It will give status of the acct", tags = { "GetAccStatus" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccStatus")
+	@ResponseStatus(HttpStatus.ACCEPTED)
 	public String getAcctStatusRqst(@RequestBody String acctinfo) {
-		
-		String respData = accountService.getAcctStatus(acctinfo);
+		kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
+		String respData = accountService.getAcctHolderAck();
 		if(respData.equals("not found"))
 			throw new AcctNotFoundException("Account Not Found");
 		
