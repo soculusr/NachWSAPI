@@ -65,13 +65,13 @@ public class AccountResource {
 	@Operation(summary = "Pan Details Request", description = "It will give acct no and PAN details", tags = { "GetPanDtls" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetPanDtls")
-	@ResponseStatus(HttpStatus.ACCEPTED)
+	@ResponseStatus(HttpStatus.OK)
 	public String getPanDtlsRqst(@RequestBody String acctinfo) {
 		
 		
-		kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
-		String respData = accountService.getPanDtlsAck();
-		
+		//kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
+		//String respData = accountService.getPanDtlsAck();
+		String respData = accountService.getPanDtls(acctinfo);
 		
 		
 		if(respData.equals("not found"))
@@ -83,11 +83,12 @@ public class AccountResource {
 	@Operation(summary = "Account Holder Request", description = "It will give acct holder name", tags = { "GetAccHolder" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccHolder")
-	@ResponseStatus(HttpStatus.ACCEPTED)
+	@ResponseStatus(HttpStatus.OK)
 	public String getAcctHolderRqst(@RequestBody String acctinfo) {
 		
-		kafkaTemplate.send(TOPIC, accountService.getAcctHolderName(acctinfo));
-		String respData = accountService.getAcctHolderAck();
+		//kafkaTemplate.send(TOPIC, accountService.getAcctHolderName(acctinfo));
+		//String respData = accountService.getAcctHolderAck();
+		String respData = accountService.getAcctHolderName(acctinfo);
 		if(respData.equals("not found"))
 			throw new AcctNotFoundException("Account Not Found");
 		
@@ -97,10 +98,11 @@ public class AccountResource {
 	@Operation(summary = "Account Status Request", description = "It will give status of the acct", tags = { "GetAccStatus" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccStatus")
-	@ResponseStatus(HttpStatus.ACCEPTED)
+	@ResponseStatus(HttpStatus.OK)
 	public String getAcctStatusRqst(@RequestBody String acctinfo) {
-		kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
-		String respData = accountService.getAcctHolderAck();
+		//kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
+		//String respData = accountService.getAcctHolderAck();
+		String respData = accountService.getAcctStatus(acctinfo);
 		if(respData.equals("not found"))
 			throw new AcctNotFoundException("Account Not Found");
 		

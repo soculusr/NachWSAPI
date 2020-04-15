@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,9 +44,14 @@ import com.api.nach.repos.ResponseRepository2;
 import com.api.nach.repos.ResponseRepository3;
 
 @Component
-public class AccountService {
+public class AccountService extends Thread{
 	
 
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
+	private static final String TOPIC = "kafka_demo";
+	
 	@Autowired
 	private RequestRepository1 accountRepository1;
 	
@@ -76,11 +82,11 @@ public class AccountService {
 	String respContent7 ="";
 	String respContent8="";
 	String respContent9="";
-	String acctTypeFi = "";
-	String fiMsg= "";
+	static String acctTypeFi = "";
+	static String fiMsg= "";
 	
-	private Map<String, String> fiMap1 = new LinkedHashMap<String, String>();
-	private Map<String, String> fiMap2 = new LinkedHashMap<String, String>();
+	private static Map<String, String> fiMap1 = new LinkedHashMap<String, String>();
+	private static Map<String, String> fiMap2 = new LinkedHashMap<String, String>();
 	private Map<String, String> fiMap3 = new LinkedHashMap<String, String>();
 	private Map<String, String> acctTypesFi = new LinkedHashMap<String, String>();
 	
@@ -93,7 +99,7 @@ public class AccountService {
 		
 	}
 
-	private ArrayList<String> fiMsgList = new ArrayList<String>();
+	private static ArrayList<String> fiMsgList = new ArrayList<String>();
 	private ArrayList<String> list1 = new ArrayList<String>();
 	private ArrayList<String> list2 = new ArrayList<String>();
 	private ArrayList<String> list3 = new ArrayList<String>();
@@ -107,8 +113,7 @@ public class AccountService {
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountService.class);
 	
 	
-	public String getPanDtls(String request) {
-		
+	public String getPanDtls(String request){
 		
 		
 		Request1 request1 = new Request1();
@@ -188,18 +193,40 @@ public class AccountService {
 				request1.setRqstcontent(requestData);
 				accountRepository1.save(request1);
 				
+				
+				
 			}
 		} catch (Exception e) {
 			logger.error("Exception", e);
 		}
+		
+		final String acctNoFinal = acctNo;
+		
+		/*Thread t1 = new Thread(new Runnable() {
+			
+			public void run() {
+				
+				
+					try {
+						getDataFi(acctNoFinal);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+				
+			}
+		});
+		t1.start();*/
 		
 		//getDataFi(acctNo);
 		
 		fiMap1.put("Nayan", "asdjkahskdjh");
 		fiMap1.put("Vaibhav", "agjshdgjasgdjhgj");
 		fiMap1.put("Aniket", "agjshdgjasasdgdjhgj");
+		fiMsgList.add("Account Not Found");
 		
 		
+		if(fiMsgList.get(0).equals("Account Found")) {
 		Set s1 = fiMap1.keySet();
 		Set s2 = fiMap1.entrySet();
 		
@@ -246,10 +273,14 @@ public class AccountService {
 		response1.setRespcontent(respContent3);
 		responseRepository1.save(response1);
 		
+		kafkaTemplate.send(TOPIC, respContent3);
+		return getPanDtlsAck();
+		}
+		else {
+			
+			return getPanDtlsNack();
+		}
 		
-		
-		return respContent3;
-		//return "not found";
 		
 		
 	}
@@ -340,11 +371,32 @@ public class AccountService {
 			e.printStackTrace();
 		}
 		
+		final String acctNoFinal = acctNo;
+		
+		/*Thread t2 = new Thread(new Runnable() {
+			
+			public void run() {
+				
+				
+					try {
+						getDataFi(acctNoFinal);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+				
+			}
+		});
+		t2.start();*/
+		
 		//getDataFi(acctNo);
 		fiMap2.put("Nayan", "asdjkahskdjh");
 		fiMap2.put("Vaibhav", "agjshdgjasgdjhgj");
 		fiMap2.put("Aniket", "agjshdgjasasdgdjhgj");
+		fiMsgList.add("Account Not Found");
 		logger.info(list4.toString());
+		
+		if(fiMsgList.get(0).equals("Account Found")) {
 		for(Map.Entry mE:fiMap2.entrySet()) {
 			
 			list4.add((String)mE.getKey());
@@ -391,9 +443,13 @@ public class AccountService {
 		response2.setRespcontent(respContent6);
 		responseRepository2.save(response2);
 		
-		
-		return respContent6;
-		
+		kafkaTemplate.send(TOPIC, respContent6);
+		return getAcctHolderAck();
+		}
+		else {
+			
+			return getAcctHolderNack();
+		}
 		
 	}
 	
@@ -474,10 +530,29 @@ public class AccountService {
 			e.printStackTrace();
 		}
 		
+		final String acctNoFinal = acctNo;
+		
+		/*Thread t3 = new Thread(new Runnable() {
+			
+			public void run() {
+				
+				
+					try {
+						getDataFi(acctNoFinal);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+				
+			}
+		});
+		t3.start();*/
+		
 		//getDataFi(acctNo);
 		
 		acctTypeFi = "SBA";
-		
+		fiMsgList.add("Account Found");
+		if(fiMsgList.get(0).equals("Account Found")) {
 		respContent7 = "<Account type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" />\r\n";
 		
 		respContent8 = "{'Source':'"+destValue+"','Service':'"+serviceName3+"','Type':'Response','Message':'<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
@@ -502,13 +577,18 @@ public class AccountService {
 		
 		
 		
+		kafkaTemplate.send(TOPIC, respContent8);
+		return getAcctStatusAck();
+		}
+		else {
+			return getAcctStatusNack();
+		}
 		
-		return respContent8;
 		
 		
 	}
 	
-	public void getDataFi(String acctNo) {
+	synchronized static void getDataFi(String acctNo) throws InterruptedException{
 		
 		String custPan = "";
 		String custName = "";
@@ -576,6 +656,21 @@ public class AccountService {
 		
 	}
 	
+	public String getPanDtlsNack() {
+		
+		Date date = Calendar.getInstance().getTime();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String ackTimestamp = dateFormat.format(date);
+		String nackData = "{'Source':'Demo','Service':'GetPanDtls','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+				"<NpciRefId value=\"\"/>\r\n"+
+				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
+				"</nachapi:GatewayAck>'}";
+		
+		return nackData;
+			
+		
+	}
+	
 	public String getAcctHolderAck() {
 		
 		Date date = Calendar.getInstance().getTime();
@@ -587,6 +682,21 @@ public class AccountService {
 				"</nachapi:GatewayAck>'}";
 		
 		return ackData;
+			
+		
+	}
+	
+	public String getAcctHolderNack() {
+		
+		Date date = Calendar.getInstance().getTime();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String ackTimestamp = dateFormat.format(date);
+		String nackData = "{'Source':'Demo','Service':'GetAccHolder','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+				"<NpciRefId value=\"\"/>\r\n"+
+				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
+				"</nachapi:GatewayAck>'}";
+		
+		return nackData;
 			
 		
 	}
@@ -606,6 +716,24 @@ public class AccountService {
 	
 }
 	
+	public String getAcctStatusNack() {
+		
+		Date date = Calendar.getInstance().getTime();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String ackTimestamp = dateFormat.format(date);
+		String nackData = "{'Source':'Demo','Service':'GetAccStatus','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+				"<NpciRefId value=\"\"/>\r\n"+
+				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
+				"</nachapi:GatewayAck>'}";
+		
+		return nackData;
+			
+		
+	}
+	
 	
 	
 }
+
+
+
