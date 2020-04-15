@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Entity
 @Table(name="request")
-public class Request2 {
+public class RequestAcctHoldr {
 	
 	@Id
 	@Column(name="unique_id")
@@ -31,7 +31,7 @@ public class Request2 {
 	
 	
 	
-	public Request2() {
+	public RequestAcctHoldr() {
 
 	}
 	

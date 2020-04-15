@@ -12,62 +12,67 @@ import org.springframework.stereotype.Component;
 @Component
 @Entity
 @Table(name="response")
-public class Response3 {
-	
+public class ResponseAcctHoldr {
 	
 	@Id
 	@Column(name="unique_id")
-	private int id6;
+	private int id5;
 	@Column(name="service_name")
-	private String servicename6;
+	private String servicename5;
 	@Column(name="response_timestamp")
-	private String resptimestamp6;
+	private String resptimestamp5;
 	@Column(name="request_id")
-	private String rqstid6;
+	private String rqstid5;
 	@Column(name="npciref_id")
-	private String npcirefid6;
+	private String npcirefid5;
 	@Column(name="response_content")
-	private String respcontent6;
+	private String respcontent5;
 	
 	
-	public Response3() {
+	
+	public ResponseAcctHoldr() {
 		
 	}
+	
 	public int getId() {
-		return id6;
+		return id5;
 	}
 	public void setId(int id) {
-		this.id6 = id;
+		this.id5 = id;
 	}
 	public String getServicename() {
-		return servicename6;
+		return servicename5;
 	}
 	public void setServicename(String servicename) {
-		this.servicename6 = servicename;
+		this.servicename5 = servicename;
 	}
 	public String getResptimestamp() {
-		return resptimestamp6;
+		return resptimestamp5;
 	}
 	public void setResptimestamp(String resptimestamp) {
-		this.resptimestamp6 = resptimestamp;
+		this.resptimestamp5 = resptimestamp;
 	}
 	public String getRqstid() {
-		return rqstid6;
+		return rqstid5;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid6 = rqstid;
+		this.rqstid5 = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid6;
+		return npcirefid5;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid6 = npcirefid;
+		this.npcirefid5 = npcirefid;
 	}
 	public String getRespcontent() {
-		return respcontent6;
+		return respcontent5;
 	}
 	public void setRespcontent(String respcontent) {
-		this.respcontent6 = respcontent;
+		this.respcontent5 = respcontent;
 	}
+	
+	
+	
+	
 
 }

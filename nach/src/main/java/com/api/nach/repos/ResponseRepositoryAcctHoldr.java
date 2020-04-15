@@ -5,14 +5,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.api.nach.models.Request1;
-import com.api.nach.models.Response2;
+import com.api.nach.models.RequestPanDtls;
+import com.api.nach.models.ResponseAcctHoldr;
 
 
 
-public interface ResponseRepository2 extends JpaRepository<Response2, Integer>{
+public interface ResponseRepositoryAcctHoldr extends JpaRepository<ResponseAcctHoldr, Integer>{
 	
 	@Query(value = "SELECT * from response where service_name='GetAccHolder'", nativeQuery = true)
-	  List<Response2> findByServiceName();
+	  List<ResponseAcctHoldr> findByServiceName();
 
 }

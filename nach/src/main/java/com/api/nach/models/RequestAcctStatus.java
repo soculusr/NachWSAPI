@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Entity
 @Table(name="request")
-public class Request3 {
+public class RequestAcctStatus {
 	
 	@Id
 	@Column(name="unique_id")
@@ -31,7 +31,7 @@ public class Request3 {
 	
 	
 	
-	public Request3() {
+	public RequestAcctStatus() {
 
 	}
 	

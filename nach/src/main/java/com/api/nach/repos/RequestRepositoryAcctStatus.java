@@ -5,15 +5,15 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.api.nach.models.Request1;
-import com.api.nach.models.Request3;
+import com.api.nach.models.RequestPanDtls;
+import com.api.nach.models.RequestAcctStatus;
 
 
 
-public interface RequestRepository3 extends JpaRepository<Request3, Integer>{
+public interface RequestRepositoryAcctStatus extends JpaRepository<RequestAcctStatus, Integer>{
 	
 	@Query(value = "SELECT * from request where service_name='GetAccStatus'", nativeQuery = true)
-	  List<Request3> findByServiceName();
+	  List<RequestAcctStatus> findByServiceName();
 	
 	@Query(value = "SELECT unique_id from request where request_id=?1", nativeQuery = true)
 	int findByReqId(String rqstId);

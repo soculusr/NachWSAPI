@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.nach.exceptions.AcctNotFoundException;
-import com.api.nach.models.Request1;
-import com.api.nach.models.Request2;
-import com.api.nach.models.Request3;
-import com.api.nach.models.Response1;
-import com.api.nach.models.Response2;
-import com.api.nach.models.Response3;
-import com.api.nach.repos.RequestRepository1;
-import com.api.nach.repos.RequestRepository2;
-import com.api.nach.repos.RequestRepository3;
-import com.api.nach.repos.ResponseRepository1;
-import com.api.nach.repos.ResponseRepository2;
-import com.api.nach.repos.ResponseRepository3;
+import com.api.nach.models.RequestPanDtls;
+import com.api.nach.models.RequestAcctHoldr;
+import com.api.nach.models.RequestAcctStatus;
+import com.api.nach.models.ResponsePanDtls;
+import com.api.nach.models.ResponseAcctHoldr;
+import com.api.nach.models.ResponseAcctStatus;
+import com.api.nach.repos.RequestRepositoryPanDtls;
+import com.api.nach.repos.RequestRepositoryAcctHoldr;
+import com.api.nach.repos.RequestRepositoryAcctStatus;
+import com.api.nach.repos.ResponseRepositoryPanDtls;
+import com.api.nach.repos.ResponseRepositoryAcctHoldr;
+import com.api.nach.repos.ResponseRepositoryAcctStatus;
 import com.api.nach.services.AccountService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,22 +42,22 @@ public class AccountResource {
 	private static final String TOPIC = "kafka_demo";
 	
 	@Autowired
-	private RequestRepository1 requestRepository1;
+	private RequestRepositoryPanDtls requestRepositoryPanDtls;
 	
 	@Autowired
-	private RequestRepository2 requestRepository2;
+	private RequestRepositoryAcctHoldr requestRepositoryAcctHoldr;
 	
 	@Autowired
-	private RequestRepository3 requestRepository3;
+	private RequestRepositoryAcctStatus requestRepositoryAcctStatus;
 	
 	@Autowired
-	private ResponseRepository1 responseRepository1;
+	private ResponseRepositoryPanDtls responseRepositoryPanDtls;
 	
 	@Autowired
-	private ResponseRepository2 responseRepository2;
+	private ResponseRepositoryAcctHoldr responseRepositoryAcctHoldr;
 	
 	@Autowired
-	private ResponseRepository3 responseRepository3;
+	private ResponseRepositoryAcctStatus responseRepositoryAcctStatus;
 	
 	@Autowired
 	AccountService accountService;
@@ -113,49 +113,49 @@ public class AccountResource {
 	@Operation(summary = "List All Request1", description = "It will give all request1 data from db", tags = { "GetAllRequest1" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllRequest1")
-	public List<Request1> getAllRequest1(){
+	public List<RequestPanDtls> getAllRequest1(){
 	
-		return requestRepository1.findByServiceName();
+		return requestRepositoryPanDtls.findByServiceName();
 	}
 	
 	@Operation(summary = "List All Request2", description = "It will give all request2 data from db", tags = { "GetAllRequest2" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllRequest2")
-	public List<Request2> getAllRequest2(){
+	public List<RequestAcctHoldr> getAllRequest2(){
 	
-		return requestRepository2.findByServiceName();
+		return requestRepositoryAcctHoldr.findByServiceName();
 	}
 	
 	@Operation(summary = "List All Request3", description = "It will give all request3 data from db", tags = { "GetAllRequest3" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllRequest3")
-	public List<Request3> getAllRequest3(){
+	public List<RequestAcctStatus> getAllRequest3(){
 	
-		return requestRepository3.findByServiceName();
+		return requestRepositoryAcctStatus.findByServiceName();
 	}
 	
 	@Operation(summary = "List All Response1", description = "It will give all resposne1 data from db", tags = { "GetAllResponse1" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllResponse1")
-	public List<Response1> getAllResponse1(){
+	public List<ResponsePanDtls> getAllResponse1(){
 	
-		return responseRepository1.findByServiceName();
+		return responseRepositoryPanDtls.findByServiceName();
 	}
 	
 	@Operation(summary = "List All Response2", description = "It will give all resposne2 data from db", tags = { "GetAllResponse2" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllResponse2")
-	public List<Response2> getAllResponse2(){
+	public List<ResponseAcctHoldr> getAllResponse2(){
 	
-		return responseRepository2.findByServiceName();
+		return responseRepositoryAcctHoldr.findByServiceName();
 	}
 	
 	@Operation(summary = "List All Response3", description = "It will give all resposne3 data from db", tags = { "GetAllResponse3" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllResponse3")
-	public List<Response3> getAllResponse3(){
+	public List<ResponseAcctStatus> getAllResponse3(){
 	
-		return responseRepository3.findByServiceName();
+		return responseRepositoryAcctStatus.findByServiceName();
 	}
 	
 	

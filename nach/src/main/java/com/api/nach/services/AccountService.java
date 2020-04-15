@@ -30,18 +30,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.api.nach.models.Request1;
-import com.api.nach.models.Request2;
-import com.api.nach.models.Request3;
-import com.api.nach.models.Response1;
-import com.api.nach.models.Response2;
-import com.api.nach.models.Response3;
-import com.api.nach.repos.RequestRepository1;
-import com.api.nach.repos.RequestRepository2;
-import com.api.nach.repos.RequestRepository3;
-import com.api.nach.repos.ResponseRepository1;
-import com.api.nach.repos.ResponseRepository2;
-import com.api.nach.repos.ResponseRepository3;
+import com.api.nach.models.RequestPanDtls;
+import com.api.nach.models.RequestAcctHoldr;
+import com.api.nach.models.RequestAcctStatus;
+import com.api.nach.models.ResponsePanDtls;
+import com.api.nach.models.ResponseAcctHoldr;
+import com.api.nach.models.ResponseAcctStatus;
+import com.api.nach.repos.RequestRepositoryPanDtls;
+import com.api.nach.repos.RequestRepositoryAcctHoldr;
+import com.api.nach.repos.RequestRepositoryAcctStatus;
+import com.api.nach.repos.ResponseRepositoryPanDtls;
+import com.api.nach.repos.ResponseRepositoryAcctHoldr;
+import com.api.nach.repos.ResponseRepositoryAcctStatus;
 
 @Component
 public class AccountService extends Thread{
@@ -53,41 +53,39 @@ public class AccountService extends Thread{
 	private static final String TOPIC = "kafka_demo";
 	
 	@Autowired
-	private RequestRepository1 accountRepository1;
+	private RequestRepositoryPanDtls requestRepositoryPanDtls;
 	
 	@Autowired
-	private RequestRepository2 accountRepository2;
+	private RequestRepositoryAcctHoldr requestRepositoryAcctHoldr;
 	
 	@Autowired
-	private RequestRepository3 accountRepository3;
+	private RequestRepositoryAcctStatus requestRepositoryAcctStatus;
 	
 	@Autowired
-	private ResponseRepository1 responseRepository1;
+	private ResponseRepositoryPanDtls responseRepositoryPanDtls;
 	
 	@Autowired
-	private ResponseRepository2 responseRepository2;
+	private ResponseRepositoryAcctHoldr responseRepositoryAcctHoldr;
 	
 	@Autowired
-	private ResponseRepository3 responseRepository3;
+	private ResponseRepositoryAcctStatus responseRepositoryAcctStatus;
 	
-	String serviceName1 = "GetPanDtls";
-	String serviceName2 = "GetAccHolder";
-	String serviceName3 = "GetAccStatus";
-	String respContent1 ="";
-	String respContent2="";
-	String respContent3="";
-	String respContent4 ="";
-	String respContent5="";
-	String respContent6="";
-	String respContent7 ="";
-	String respContent8="";
-	String respContent9="";
+	String panDtlsService = "GetPanDtls";
+	String acctHoldrService = "GetAccHolder";
+	String acctStatusService = "GetAccStatus";
+	String panDtlsAcctHolder ="";
+	String panDtlsAcctHolders="";
+	String panDtlsResp="";
+	String acctHolderName ="";
+	String acctHolderNames="";
+	String acctHolderResp="";
+	String acctStatusType ="";
+	String acctStatusResp="";
 	static String acctTypeFi = "";
 	static String fiMsg= "";
 	
-	private static Map<String, String> fiMap1 = new LinkedHashMap<String, String>();
-	private static Map<String, String> fiMap2 = new LinkedHashMap<String, String>();
-	private Map<String, String> fiMap3 = new LinkedHashMap<String, String>();
+	private static Map<String, String> fiCustNamePan = new LinkedHashMap<String, String>();
+	private static Map<String, String> fiCustNameIfsc = new LinkedHashMap<String, String>();
 	private Map<String, String> acctTypesFi = new LinkedHashMap<String, String>();
 	
 	public AccountService() {
@@ -100,15 +98,12 @@ public class AccountService extends Thread{
 	}
 
 	private static ArrayList<String> fiMsgList = new ArrayList<String>();
-	private ArrayList<String> list1 = new ArrayList<String>();
-	private ArrayList<String> list2 = new ArrayList<String>();
-	private ArrayList<String> list3 = new ArrayList<String>();
-	private ArrayList<String> list4 = new ArrayList<String>();
-	private ArrayList<String> list5 = new ArrayList<String>();
-	private ArrayList<String> list6 = new ArrayList<String>();
-	private ArrayList<String> list7 = new ArrayList<String>();
-	private ArrayList<String> list8 = new ArrayList<String>();
-	private ArrayList<String> list9 = new ArrayList<String>();
+	private ArrayList<String> panDtlsCustNames = new ArrayList<String>();
+	private ArrayList<String> panDtlsCustPanNos = new ArrayList<String>();
+	private ArrayList<String> panDtlsFinal = new ArrayList<String>();
+	private ArrayList<String> acctHoldrCustName = new ArrayList<String>();
+	private ArrayList<String> acctHoldrCustNames = new ArrayList<String>();
+
 	
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountService.class);
 	
@@ -116,8 +111,8 @@ public class AccountService extends Thread{
 	public String getPanDtls(String request){
 		
 		
-		Request1 request1 = new Request1();
-		Response1 response1 = new Response1();
+		RequestPanDtls requestPanDtls = new RequestPanDtls();
+		ResponsePanDtls responsePanDtls = new ResponsePanDtls();
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -128,13 +123,13 @@ public class AccountService extends Thread{
 		String reqId="";
 		String reqType="";
 		String reqTimestamp = "";
-		respContent1 ="";
-		respContent2="";
-		respContent3="";
-		fiMap1.clear();
-		list1.clear();
-		list2.clear();
-		list3.clear();
+		panDtlsAcctHolder ="";
+		panDtlsAcctHolders="";
+		panDtlsResp="";
+		fiCustNamePan.clear();
+		panDtlsCustNames.clear();
+		panDtlsCustPanNos.clear();
+		panDtlsFinal.clear();
 		//System.out.println("request data is" +request);
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -151,47 +146,47 @@ public class AccountService extends Thread{
 			Element root = document.getDocumentElement();
 			logger.info("Root node is "+root.getNodeName());
 			
-			NodeList nList1 = document.getElementsByTagName("Detail");
-			NodeList nList2 = document.getElementsByTagName("NpciRefId");
-			NodeList nList3 = document.getElementsByTagName("Source");
-			NodeList nList4 = document.getElementsByTagName("Destination");
-			NodeList nList5 = document.getElementsByTagName("Request");
-			NodeList nList6 = document.getElementsByTagName("Head");
+			NodeList nListDtl = document.getElementsByTagName("Detail");
+			NodeList nListRefId = document.getElementsByTagName("NpciRefId");
+			NodeList nListSrc = document.getElementsByTagName("Source");
+			NodeList nListDest = document.getElementsByTagName("Destination");
+			NodeList nListReq = document.getElementsByTagName("Request");
+			NodeList nListHead = document.getElementsByTagName("Head");
 			
 		
-			logger.info("Node list length "+nList1.getLength());
+			logger.info("Node list length "+nListDtl.getLength());
 			
-			for(int i=0;i<nList1.getLength();i++) {
+			for(int i=0;i<nListDtl.getLength();i++) {
 				
-				Node node1 = nList1.item(i);
-				Node node2 = nList2.item(i);
-				Node node3 = nList3.item(i);
-				Node node4 = nList4.item(i);
-				Node node5 = nList5.item(i);
-				Node node6 = nList6.item(i);
+				Node dtlNode = nListDtl.item(i);
+				Node refIdNode = nListRefId.item(i);
+				Node srcNode = nListSrc.item(i);
+				Node destNode = nListDest.item(i);
+				Node reqNode = nListReq.item(i);
+				Node headNode = nListHead.item(i);
 				
-				Element element1 = (Element) node1;
-				Element element2 = (Element) node2;
-				Element element3 = (Element) node3;
-				Element element4 = (Element) node4;
-				Element element5 = (Element) node5;
-				Element element6 = (Element) node6;
+				Element dtlElement = (Element) dtlNode;
+				Element refIdElement = (Element) refIdNode;
+				Element srcElement = (Element) srcNode;
+				Element destElement = (Element) destNode;
+				Element reqElement = (Element) reqNode;
+				Element headElement = (Element) headNode;
 				
-				acctNo = element1.getAttribute("accNo");
-				npciRefId = element2.getAttribute("value");
-				sourceValue = element3.getAttribute("value");
-				sourceName = element3.getAttribute("name");
-				destValue = element4.getAttribute("value");
-				destName = element4.getAttribute("name");
-				reqId = element5.getAttribute("id");
-				reqTimestamp = element6.getAttribute("ts");
+				acctNo = dtlElement.getAttribute("accNo");
+				npciRefId = refIdElement.getAttribute("value");
+				sourceValue = srcElement.getAttribute("value");
+				sourceName = srcElement.getAttribute("name");
+				destValue = destElement.getAttribute("value");
+				destName = destElement.getAttribute("name");
+				reqId = reqElement.getAttribute("id");
+				reqTimestamp = headElement.getAttribute("ts");
 				
-				request1.setServicename(serviceName1);
-				request1.setRqsttimestamp(reqTimestamp);
-				request1.setRqstid(reqId);
-				request1.setNpcirefid(npciRefId);
-				request1.setRqstcontent(requestData);
-				accountRepository1.save(request1);
+				requestPanDtls.setServicename(panDtlsService);
+				requestPanDtls.setRqsttimestamp(reqTimestamp);
+				requestPanDtls.setRqstid(reqId);
+				requestPanDtls.setNpcirefid(npciRefId);
+				requestPanDtls.setRqstcontent(requestData);
+				requestRepositoryPanDtls.save(requestPanDtls);
 				
 				
 				
@@ -220,38 +215,38 @@ public class AccountService extends Thread{
 		
 		//getDataFi(acctNo);
 		
-		fiMap1.put("Nayan", "asdjkahskdjh");
-		fiMap1.put("Vaibhav", "agjshdgjasgdjhgj");
-		fiMap1.put("Aniket", "agjshdgjasasdgdjhgj");
-		fiMsgList.add("Account Not Found");
+		fiCustNamePan.put("Nayan", "asdjkahskdjh");
+		fiCustNamePan.put("Vaibhav", "agjshdgjasgdjhgj");
+		fiCustNamePan.put("Aniket", "agjshdgjasasdgdjhgj");
+		fiMsgList.add("Account Found");
 		
 		
 		if(fiMsgList.get(0).equals("Account Found")) {
-		Set s1 = fiMap1.keySet();
-		Set s2 = fiMap1.entrySet();
+		Set s1 = fiCustNamePan.keySet();
+		Set s2 = fiCustNamePan.entrySet();
 		
-		for(Map.Entry mE:fiMap1.entrySet()) {
+		for(Map.Entry mE:fiCustNamePan.entrySet()) {
 			
-			list1.add((String)mE.getKey());
-			list2.add((String)mE.getValue());
+			panDtlsCustNames.add((String)mE.getKey());
+			panDtlsCustPanNos.add((String)mE.getValue());
 		}
 		
-		if(fiMap1.size()>1) {
+		if(fiCustNamePan.size()>1) {
 			
-			for(int i=0;i<list1.size();i++) {
+			for(int i=0;i<panDtlsCustNames.size();i++) {
 				
-				respContent1 = "<AccHolder pan=\""+list2.get(i)+"\"name=\""+list1.get(i)+"\"/>\r\n";
-				list3.add(respContent1);
-				respContent2 = respContent2 + list3.get(i);
+				panDtlsAcctHolder = "<AccHolder pan=\""+panDtlsCustPanNos.get(i)+"\"name=\""+panDtlsCustNames.get(i)+"\"/>\r\n";
+				panDtlsFinal.add(panDtlsAcctHolder);
+				panDtlsAcctHolders = panDtlsAcctHolders + panDtlsFinal.get(i);
 				
 			}
 		}
 		else {
 			
-			respContent2 = "<AccHolder pan=\""+list2.get(0)+"\"name=\""+list1.get(0)+"\"/>\r\n";
+			panDtlsAcctHolders = "<AccHolder pan=\""+panDtlsCustPanNos.get(0)+"\"name=\""+panDtlsCustNames.get(0)+"\"/>\r\n";
 		}
 		
-		respContent3 = "{'Source':'"+destValue+"','Service':'"+serviceName1+"','Type':'Response','Message':'<ach:GetPanDtlsResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'Response','Message':'<ach:GetPanDtlsResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
 				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
 				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
 				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
@@ -260,20 +255,20 @@ public class AccountService extends Thread{
 				"  <Resp ts=\""+respTimestamp+"\" result=\"SUCCESS\" errCode=\"\" rejectedBy=\"\" />\r\n" + 
 				"  <RespData>\r\n" + 
 				"<AccHolderList>\r\n" + 
-				respContent2+
+				panDtlsAcctHolders+
 				"	</AccHolderList>\r\n" + 
 				"</RespData>\r\n" + 
 				"</ach:GetPanDtlsResp>'}";
 		
-		response1.setId(accountRepository1.findByReqId(reqId));
-		response1.setServicename(serviceName1);
-		response1.setResptimestamp(respTimestamp);
-		response1.setRqstid(reqId);
-		response1.setNpcirefid(npciRefId);
-		response1.setRespcontent(respContent3);
-		responseRepository1.save(response1);
+		responsePanDtls.setId(requestRepositoryPanDtls.findByReqId(reqId));
+		responsePanDtls.setServicename(panDtlsService);
+		responsePanDtls.setResptimestamp(respTimestamp);
+		responsePanDtls.setRqstid(reqId);
+		responsePanDtls.setNpcirefid(npciRefId);
+		responsePanDtls.setRespcontent(panDtlsResp);
+		responseRepositoryPanDtls.save(responsePanDtls);
 		
-		kafkaTemplate.send(TOPIC, respContent3);
+		kafkaTemplate.send(TOPIC, panDtlsResp);
 		return getPanDtlsAck();
 		}
 		else {
@@ -286,10 +281,10 @@ public class AccountService extends Thread{
 	}
 	
 	public String getAcctHolderName(String request) {
-		Request2 request2 = new Request2();
+		RequestAcctHoldr request2 = new RequestAcctHoldr();
 		
 		
-		Response2 response2 = new Response2(); 
+		ResponseAcctHoldr response2 = new ResponseAcctHoldr(); 
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -306,12 +301,12 @@ public class AccountService extends Thread{
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
 		String requestData = request;
-		fiMap2.clear();
-		list4.clear();
-		list5.clear();
-		respContent4="";
-		respContent5="";
-		respContent6="";
+		fiCustNameIfsc.clear();
+		acctHoldrCustName.clear();
+		acctHoldrCustNames.clear();
+		acctHolderName="";
+		acctHolderNames="";
+		acctHolderResp="";
 		
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -323,48 +318,48 @@ public class AccountService extends Thread{
 			Element root = document.getDocumentElement();
 			System.out.println("Root node is "+root.getNodeName());
 			
-			NodeList nList1 = document.getElementsByTagName("Detail");
-			NodeList nList2 = document.getElementsByTagName("NpciRefId");
-			NodeList nList3 = document.getElementsByTagName("Source");
-			NodeList nList4 = document.getElementsByTagName("Destination");
-			NodeList nList5 = document.getElementsByTagName("Request");
-			NodeList nList6 = document.getElementsByTagName("Head");
+			NodeList nListDtl = document.getElementsByTagName("Detail");
+			NodeList nListRefId = document.getElementsByTagName("NpciRefId");
+			NodeList nListSrc = document.getElementsByTagName("Source");
+			NodeList nListDest = document.getElementsByTagName("Destination");
+			NodeList nListReq = document.getElementsByTagName("Request");
+			NodeList nListHead = document.getElementsByTagName("Head");
 			
-			System.out.println("Node list length "+nList1.getLength());
+			System.out.println("Node list length "+nListDtl.getLength());
 			
-			for(int i=0;i<nList1.getLength();i++) {
+			for(int i=0;i<nListDtl.getLength();i++) {
 				
-				Node node1 = nList1.item(i);
-				Node node2 = nList2.item(i);
-				Node node3 = nList3.item(i);
-				Node node4 = nList4.item(i);
-				Node node5 = nList5.item(i);
-				Node node6 = nList6.item(i);
+				Node dtlNode = nListDtl.item(i);
+				Node refIdNode = nListRefId.item(i);
+				Node srcNode = nListSrc.item(i);
+				Node destNode = nListDest.item(i);
+				Node reqNode = nListReq.item(i);
+				Node headNode = nListHead.item(i);
 				
-				Element element1 = (Element) node1;
-				Element element2 = (Element) node2;
-				Element element3 = (Element) node3;
-				Element element4 = (Element) node4;
-				Element element5 = (Element) node5;
-				Element element6 = (Element) node6;
+				Element dtlElement = (Element) dtlNode;
+				Element refIdElement = (Element) refIdNode;
+				Element srcElement = (Element) srcNode;
+				Element destElement = (Element) destNode;
+				Element reqElement = (Element) reqNode;
+				Element headElement = (Element) headNode;
 				
-				acctNo = element1.getAttribute("accNo");
+				acctNo = dtlElement.getAttribute("accNo");
 				if(xmlContent.contains("GetAccStatus"))
-					ifscCode = element1.getAttribute("ifsc");
-				npciRefId = element2.getAttribute("value");
-				sourceValue = element3.getAttribute("value");
-				sourceName = element3.getAttribute("name");
-				destValue = element4.getAttribute("value");
-				destName = element4.getAttribute("name");
-				reqId = element5.getAttribute("id");
-				reqTimestamp = element6.getAttribute("ts");
+					ifscCode = dtlElement.getAttribute("ifsc");
+				npciRefId = refIdElement.getAttribute("value");
+				sourceValue = srcElement.getAttribute("value");
+				sourceName = srcElement.getAttribute("name");
+				destValue = destElement.getAttribute("value");
+				destName = destElement.getAttribute("name");
+				reqId = reqElement.getAttribute("id");
+				reqTimestamp = headElement.getAttribute("ts");
 				
-				request2.setServicename(serviceName2);
+				request2.setServicename(acctHoldrService);
 				request2.setRqsttimestamp(reqTimestamp);
 				request2.setRqstid(reqId);
 				request2.setNpcirefid(npciRefId);
 				request2.setRqstcontent(requestData);
-				accountRepository2.save(request2);
+				requestRepositoryAcctHoldr.save(request2);
 				
 			}
 		} catch (Exception e) {
@@ -390,37 +385,37 @@ public class AccountService extends Thread{
 		t2.start();*/
 		
 		//getDataFi(acctNo);
-		fiMap2.put("Nayan", "asdjkahskdjh");
-		fiMap2.put("Vaibhav", "agjshdgjasgdjhgj");
-		fiMap2.put("Aniket", "agjshdgjasasdgdjhgj");
-		fiMsgList.add("Account Not Found");
-		logger.info(list4.toString());
+		fiCustNameIfsc.put("Nayan", "asdjkahskdjh");
+		fiCustNameIfsc.put("Vaibhav", "agjshdgjasgdjhgj");
+		fiCustNameIfsc.put("Aniket", "agjshdgjasasdgdjhgj");
+		fiMsgList.add("Account Found");
+		logger.info(acctHoldrCustName.toString());
 		
 		if(fiMsgList.get(0).equals("Account Found")) {
-		for(Map.Entry mE:fiMap2.entrySet()) {
+		for(Map.Entry mE:fiCustNameIfsc.entrySet()) {
 			
-			list4.add((String)mE.getKey());
+			acctHoldrCustName.add((String)mE.getKey());
 			
 		}
 		
-		if(fiMap2.size()>1) {
+		if(fiCustNameIfsc.size()>1) {
 			
-			for(int i=0;i<list4.size();i++) {
+			for(int i=0;i<acctHoldrCustName.size();i++) {
 				
-				logger.info("Account holder "+ list4.get(i));
+				logger.info("Account holder "+ acctHoldrCustName.get(i));
 				
-				respContent4 = "<AccHolder name=\""+list4.get(i)+"\" />\r\n";
-				list5.add(respContent4);
-				respContent5 = respContent5 + list5.get(i);
+				acctHolderName = "<AccHolder name=\""+acctHoldrCustName.get(i)+"\" />\r\n";
+				acctHoldrCustNames.add(acctHolderName);
+				acctHolderNames = acctHolderNames + acctHoldrCustNames.get(i);
 				
 			}
 		}
 		else {
 			
-			respContent5 = "<AccHolder name=\""+list4.get(0)+"\" />\r\n";
+			acctHolderNames = "<AccHolder name=\""+acctHoldrCustName.get(0)+"\" />\r\n";
 		}
 		
-		respContent6 = "{'Source':'"+destValue+"','Service':'"+serviceName2+"','Type':'Response','Message':'<ach:GetAccHolderResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'Response','Message':'<ach:GetAccHolderResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
 				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
 				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
 				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
@@ -428,22 +423,22 @@ public class AccountService extends Thread{
 				"  <Resp ts=\""+respTimestamp+"\" result=\"SUCCESS\" errCode=\"\" rejectedBy=\"\" />\r\n" + 
 				"  <RespData>\r\n" + 
 				"  <AccHolderList>\r\n" + 
-				respContent5+
+				acctHolderNames+
 				"	</AccHolderList>\r\n" + 
 				"  </RespData>\r\n" + 
 				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
 				"</ach:GetAccHolderResp>'}";
 		
 		
-		response2.setId(accountRepository2.findByReqId(reqId));
-		response2.setServicename(serviceName1);
+		response2.setId(requestRepositoryAcctHoldr.findByReqId(reqId));
+		response2.setServicename(panDtlsService);
 		response2.setResptimestamp(respTimestamp);
 		response2.setRqstid(reqId);
 		response2.setNpcirefid(npciRefId);
-		response2.setRespcontent(respContent6);
-		responseRepository2.save(response2);
+		response2.setRespcontent(acctHolderResp);
+		responseRepositoryAcctHoldr.save(response2);
 		
-		kafkaTemplate.send(TOPIC, respContent6);
+		kafkaTemplate.send(TOPIC, acctHolderResp);
 		return getAcctHolderAck();
 		}
 		else {
@@ -454,8 +449,8 @@ public class AccountService extends Thread{
 	}
 	
 	public String getAcctStatus(String request) {
-		Request3 request3 = new Request3();
-		Response3 response3 = new Response3();
+		RequestAcctStatus request3 = new RequestAcctStatus();
+		ResponseAcctStatus response3 = new ResponseAcctStatus();
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -471,8 +466,8 @@ public class AccountService extends Thread{
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
 		String requestData = request;
-		respContent7="";
-		respContent8="";
+		acctStatusType="";
+		acctStatusResp="";
 		
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -484,46 +479,46 @@ public class AccountService extends Thread{
 			Element root = document.getDocumentElement();
 			System.out.println("Root node is "+root.getNodeName());
 			
-			NodeList nList1 = document.getElementsByTagName("Detail");
-			NodeList nList2 = document.getElementsByTagName("NpciRefId");
-			NodeList nList3 = document.getElementsByTagName("Source");
-			NodeList nList4 = document.getElementsByTagName("Destination");
-			NodeList nList5 = document.getElementsByTagName("Request");
-			NodeList nList6 = document.getElementsByTagName("Head");
+			NodeList nListDtl = document.getElementsByTagName("Detail");
+			NodeList nListRefId = document.getElementsByTagName("NpciRefId");
+			NodeList nListSrc = document.getElementsByTagName("Source");
+			NodeList nListDest = document.getElementsByTagName("Destination");
+			NodeList nListReq = document.getElementsByTagName("Request");
+			NodeList nListHead = document.getElementsByTagName("Head");
 			
-			System.out.println("Node list length "+nList1.getLength());
+			System.out.println("Node list length "+nListDtl.getLength());
 			
-			for(int i=0;i<nList1.getLength();i++) {
+			for(int i=0;i<nListDtl.getLength();i++) {
 				
-				Node node1 = nList1.item(i);
-				Node node2 = nList2.item(i);
-				Node node3 = nList3.item(i);
-				Node node4 = nList4.item(i);
-				Node node5 = nList5.item(i);
-				Node node6 = nList6.item(i);
+				Node dtlNode = nListDtl.item(i);
+				Node refIdNode = nListRefId.item(i);
+				Node srcNode = nListSrc.item(i);
+				Node destNode = nListDest.item(i);
+				Node reqNode = nListReq.item(i);
+				Node headNode = nListHead.item(i);
 				
-				Element element1 = (Element) node1;
-				Element element2 = (Element) node2;
-				Element element3 = (Element) node3;
-				Element element4 = (Element) node4;
-				Element element5 = (Element) node5;
-				Element element6 = (Element) node6;
+				Element dtlElement = (Element) dtlNode;
+				Element refIdElement = (Element) refIdNode;
+				Element srcElement = (Element) srcNode;
+				Element destElement = (Element) destNode;
+				Element reqElement = (Element) reqNode;
+				Element headElement = (Element) headNode;
 				
-				acctNo = element1.getAttribute("accNo");
-				npciRefId = element2.getAttribute("value");
-				sourceValue = element3.getAttribute("value");
-				sourceName = element3.getAttribute("name");
-				destValue = element4.getAttribute("value");
-				destName = element4.getAttribute("name");
-				reqId = element5.getAttribute("id");
-				reqTimestamp = element6.getAttribute("ts");
+				acctNo = dtlElement.getAttribute("accNo");
+				npciRefId = refIdElement.getAttribute("value");
+				sourceValue = srcElement.getAttribute("value");
+				sourceName = srcElement.getAttribute("name");
+				destValue = destElement.getAttribute("value");
+				destName = destElement.getAttribute("name");
+				reqId = reqElement.getAttribute("id");
+				reqTimestamp = headElement.getAttribute("ts");
 				
-				request3.setServicename(serviceName3);
+				request3.setServicename(acctStatusService);
 				request3.setRqsttimestamp(reqTimestamp);
 				request3.setRqstid(reqId);
 				request3.setNpcirefid(npciRefId);
 				request3.setRqstcontent(requestData);
-				accountRepository3.save(request3);
+				requestRepositoryAcctStatus.save(request3);
 				
 			}
 		} catch (Exception e) {
@@ -553,9 +548,9 @@ public class AccountService extends Thread{
 		acctTypeFi = "SBA";
 		fiMsgList.add("Account Found");
 		if(fiMsgList.get(0).equals("Account Found")) {
-		respContent7 = "<Account type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" />\r\n";
+		acctStatusType = "<Account type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" />\r\n";
 		
-		respContent8 = "{'Source':'"+destValue+"','Service':'"+serviceName3+"','Type':'Response','Message':'<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'Response','Message':'<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
 				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
 				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
 				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
@@ -563,21 +558,21 @@ public class AccountService extends Thread{
 				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
 				"  <Resp ts=\""+respTimestamp+"\" result=\"SUCCESS\" errCode=\"\" rejectedBy=\"\"/>\r\n" + 
 				"<RespData>\r\n" + 
-				respContent7+ 
+				acctStatusType+ 
 				"</RespData>\r\n" + 
 				"</ach:GetAccStatusResp>'}";
 		
-		response3.setId(accountRepository3.findByReqId(reqId));
-		response3.setServicename(serviceName1);
+		response3.setId(requestRepositoryAcctStatus.findByReqId(reqId));
+		response3.setServicename(panDtlsService);
 		response3.setResptimestamp(respTimestamp);
 		response3.setRqstid(reqId);
 		response3.setNpcirefid(npciRefId);
-		response3.setRespcontent(respContent8);
-		responseRepository3.save(response3);
+		response3.setRespcontent(acctStatusResp);
+		responseRepositoryAcctStatus.save(response3);
 		
 		
 		
-		kafkaTemplate.send(TOPIC, respContent8);
+		kafkaTemplate.send(TOPIC, acctStatusResp);
 		return getAcctStatusAck();
 		}
 		else {
@@ -596,8 +591,8 @@ public class AccountService extends Thread{
 		String fiUrl = "";
 		
 		String ifscCodeFi = "";
-		fiMap1.clear();
-		fiMap2.clear();
+		fiCustNamePan.clear();
+		fiCustNameIfsc.clear();
 		try {
 			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -623,8 +618,8 @@ public class AccountService extends Thread{
 					custName = document.getElementsByTagName("custName").item(i).getTextContent();
 					custPan = document.getElementsByTagName("custPAN").item(i).getTextContent();
 					
-					fiMap1.put(custName, custPan);
-					fiMap2.put(custName, ifscCodeFi);
+					fiCustNamePan.put(custName, custPan);
+					fiCustNameIfsc.put(custName, ifscCodeFi);
 					
 				}
 			}

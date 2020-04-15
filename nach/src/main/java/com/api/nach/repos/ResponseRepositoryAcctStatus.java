@@ -5,14 +5,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.api.nach.models.Request1;
-import com.api.nach.models.Response3;
+import com.api.nach.models.RequestPanDtls;
+import com.api.nach.models.ResponseAcctStatus;
 
 
 
-public interface ResponseRepository3 extends JpaRepository<Response3, Integer>{
+public interface ResponseRepositoryAcctStatus extends JpaRepository<ResponseAcctStatus, Integer>{
 	
 	@Query(value = "SELECT * from response where service_name='GetAccStatus'", nativeQuery = true)
-	  List<Response3> findByServiceName();
+	  List<ResponseAcctStatus> findByServiceName();
 
 }
