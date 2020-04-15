@@ -110,50 +110,50 @@ public class AccountResource {
 	}
 	
 	
-	@Operation(summary = "List All Request1", description = "It will give all request1 data from db", tags = { "GetAllRequest1" })
+	@Operation(summary = "List All Pan Details Request", description = "It will give all request1 data from db", tags = { "GetAllRequest1" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllRequest1")
-	public List<RequestPanDtls> getAllRequest1(){
+	@GetMapping("/GetAllPanDtlsRequest")
+	public List<RequestPanDtls> getAllPanDtlsRequest(){
 	
 		return requestRepositoryPanDtls.findByServiceName();
 	}
 	
-	@Operation(summary = "List All Request2", description = "It will give all request2 data from db", tags = { "GetAllRequest2" })
+	@Operation(summary = "List All Acct Holder Request", description = "It will give all request2 data from db", tags = { "GetAllRequest2" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllRequest2")
-	public List<RequestAcctHoldr> getAllRequest2(){
+	@GetMapping("/GetAllAcctHoldrRequest")
+	public List<RequestAcctHoldr> getAllAcctHoldrRequest(){
 	
 		return requestRepositoryAcctHoldr.findByServiceName();
 	}
 	
 	@Operation(summary = "List All Request3", description = "It will give all request3 data from db", tags = { "GetAllRequest3" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllRequest3")
-	public List<RequestAcctStatus> getAllRequest3(){
+	@GetMapping("/GetAllAcctStatusRequest")
+	public List<RequestAcctStatus> getAllAcctStatusRequest(){
 	
 		return requestRepositoryAcctStatus.findByServiceName();
 	}
 	
-	@Operation(summary = "List All Response1", description = "It will give all resposne1 data from db", tags = { "GetAllResponse1" })
+	@Operation(summary = "List All Pan Details Response", description = "It will give all resposne1 data from db", tags = { "GetAllResponse1" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllResponse1")
-	public List<ResponsePanDtls> getAllResponse1(){
+	@GetMapping("/GetAllPanDtlsResponse")
+	public List<ResponsePanDtls> getAllPanDtlsResponse(){
 	
 		return responseRepositoryPanDtls.findByServiceName();
 	}
 	
-	@Operation(summary = "List All Response2", description = "It will give all resposne2 data from db", tags = { "GetAllResponse2" })
+	@Operation(summary = "List All Acct Holder Response", description = "It will give all resposne2 data from db", tags = { "GetAllResponse2" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllResponse2")
-	public List<ResponseAcctHoldr> getAllResponse2(){
+	@GetMapping("/GetAllAcctHoldrResponse")
+	public List<ResponseAcctHoldr> getAllAcctHoldrResponse(){
 	
 		return responseRepositoryAcctHoldr.findByServiceName();
 	}
 	
-	@Operation(summary = "List All Response3", description = "It will give all resposne3 data from db", tags = { "GetAllResponse3" })
+	@Operation(summary = "List All Acct Status Response", description = "It will give all resposne3 data from db", tags = { "GetAllResponse3" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@GetMapping("/GetAllResponse3")
-	public List<ResponseAcctStatus> getAllResponse3(){
+	public List<ResponseAcctStatus> getAllAcctStatusResponse(){
 	
 		return responseRepositoryAcctStatus.findByServiceName();
 	}
