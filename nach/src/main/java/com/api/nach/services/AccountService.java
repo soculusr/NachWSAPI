@@ -210,7 +210,7 @@ public class AccountService extends Thread{
 					try {
 						getDataFi(acctNoFinal);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						logger.error("Exception",e);
 					}
 					
 				
@@ -368,7 +368,7 @@ public class AccountService extends Thread{
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Exception",e);
 		}
 		
 		final String acctNoFinal = acctNo;
@@ -381,7 +381,7 @@ public class AccountService extends Thread{
 					try {
 						getDataFi(acctNoFinal);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						logger.error("Exception",e);
 					}
 					
 				
@@ -527,7 +527,7 @@ public class AccountService extends Thread{
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Exception",e);
 		}
 		
 		final String acctNoFinal = acctNo;
@@ -540,7 +540,7 @@ public class AccountService extends Thread{
 					try {
 						getDataFi(acctNoFinal);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						logger.error("Exception",e);
 					}
 					
 				
@@ -636,7 +636,7 @@ public class AccountService extends Thread{
 			
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			logger.error("Exception",e);
 		}
 		
 	}
