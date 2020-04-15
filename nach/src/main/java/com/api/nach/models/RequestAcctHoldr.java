@@ -17,17 +17,17 @@ public class RequestAcctHoldr {
 	@Id
 	@Column(name="unique_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id2;
+	private int uniqueAcctHolderReqId;
 	@Column(name="service_name")
-	private String servicename2;
+	private String acctHoldrServiceName;
 	@Column(name="request_timestamp")
-	private String rqsttimestamp2;
+	private String acctHoldrReqTimestamp;
 	@Column(name="request_id")
-	private String rqstid2;
+	private String acctHoldrReqId;
 	@Column(name="npciref_id")
-	private String npcirefid2;
+	private String acttHoldrNpciRefId;
 	@Column(name="request_content")
-	private String rqstcontent2;
+	private String acctHoldrReqContent;
 	
 	
 	
@@ -38,40 +38,40 @@ public class RequestAcctHoldr {
 	
 	
 	public int getId() {
-		return id2;
+		return uniqueAcctHolderReqId;
 	}
 	public void setId(int id) {
-		this.id2 = id;
+		this.uniqueAcctHolderReqId = id;
 	}
 	public String getServicename() {
-		return servicename2;
+		return acctHoldrServiceName;
 	}
 	public void setServicename(String servicename) {
-		this.servicename2 = servicename;
+		this.acctHoldrServiceName = servicename;
 	}
 	public String getRqsttimestamp() {
-		return rqsttimestamp2;
+		return acctHoldrReqTimestamp;
 	}
 	public void setRqsttimestamp(String rqsttimestamp) {
-		this.rqsttimestamp2 = rqsttimestamp;
+		this.acctHoldrReqTimestamp = rqsttimestamp;
 	}
 	public String getRqstid() {
-		return rqstid2;
+		return acctHoldrReqId;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid2 = rqstid;
+		this.acctHoldrReqId = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid2;
+		return acttHoldrNpciRefId;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid2 = npcirefid;
+		this.acttHoldrNpciRefId = npcirefid;
 	}
 	public String getRqstcontent() {
-		return rqstcontent2;
+		return acctHoldrReqContent;
 	}
 	public void setRqstcontent(String rqstcontent) {
-		this.rqstcontent2 = rqstcontent;
+		this.acctHoldrReqContent = rqstcontent;
 	}
 
 }

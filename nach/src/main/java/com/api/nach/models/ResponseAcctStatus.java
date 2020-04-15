@@ -17,15 +17,15 @@ public class ResponseAcctStatus {
 	
 	@Id
 	@Column(name="unique_id")
-	private int id6;
+	private int acctStatusRespUniqueId;
 	@Column(name="service_name")
-	private String servicename6;
+	private String acctStatusRespServiceName;
 	@Column(name="response_timestamp")
-	private String resptimestamp6;
+	private String acctStatusRespTimestamp;
 	@Column(name="request_id")
-	private String rqstid6;
+	private String acctStatusRespReqId;
 	@Column(name="npciref_id")
-	private String npcirefid6;
+	private String acctStatusRespNpciRefId;
 	@Column(name="response_content")
 	private String respcontent6;
 	
@@ -34,34 +34,34 @@ public class ResponseAcctStatus {
 		
 	}
 	public int getId() {
-		return id6;
+		return acctStatusRespUniqueId;
 	}
 	public void setId(int id) {
-		this.id6 = id;
+		this.acctStatusRespUniqueId = id;
 	}
 	public String getServicename() {
-		return servicename6;
+		return acctStatusRespServiceName;
 	}
 	public void setServicename(String servicename) {
-		this.servicename6 = servicename;
+		this.acctStatusRespServiceName = servicename;
 	}
 	public String getResptimestamp() {
-		return resptimestamp6;
+		return acctStatusRespTimestamp;
 	}
 	public void setResptimestamp(String resptimestamp) {
-		this.resptimestamp6 = resptimestamp;
+		this.acctStatusRespTimestamp = resptimestamp;
 	}
 	public String getRqstid() {
-		return rqstid6;
+		return acctStatusRespReqId;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid6 = rqstid;
+		this.acctStatusRespReqId = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid6;
+		return acctStatusRespNpciRefId;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid6 = npcirefid;
+		this.acctStatusRespNpciRefId = npcirefid;
 	}
 	public String getRespcontent() {
 		return respcontent6;

@@ -16,17 +16,17 @@ public class ResponsePanDtls {
 	
 	@Id
 	@Column(name="unique_id")
-	private int id4;
+	private int panDtlsUniqueRespId;
 	@Column(name="service_name")
-	private String servicename4;
+	private String panDtlsRespServiceName;
 	@Column(name="response_timestamp")
-	private String resptimestamp4;
+	private String panDtlsRespTimestamp;
 	@Column(name="request_id")
-	private String rqstid4;
+	private String panDtlsRespReqId;
 	@Column(name="npciref_id")
-	private String npcirefid4;
+	private String panDtlsRespNpciRefId;
 	@Column(name="response_content")
-	private String respcontent4;
+	private String panDtlsRespContent;
 	
 	
 	
@@ -35,40 +35,40 @@ public class ResponsePanDtls {
 	}
 	
 	public int getId() {
-		return id4;
+		return panDtlsUniqueRespId;
 	}
 	public void setId(int id) {
-		this.id4 = id;
+		this.panDtlsUniqueRespId = id;
 	}
 	public String getServicename() {
-		return servicename4;
+		return panDtlsRespServiceName;
 	}
 	public void setServicename(String servicename) {
-		this.servicename4 = servicename;
+		this.panDtlsRespServiceName = servicename;
 	}
 	public String getResptimestamp() {
-		return resptimestamp4;
+		return panDtlsRespTimestamp;
 	}
 	public void setResptimestamp(String resptimestamp) {
-		this.resptimestamp4 = resptimestamp;
+		this.panDtlsRespTimestamp = resptimestamp;
 	}
 	public String getRqstid() {
-		return rqstid4;
+		return panDtlsRespReqId;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid4 = rqstid;
+		this.panDtlsRespReqId = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid4;
+		return panDtlsRespNpciRefId;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid4 = npcirefid;
+		this.panDtlsRespNpciRefId = npcirefid;
 	}
 	public String getRespcontent() {
-		return respcontent4;
+		return panDtlsRespContent;
 	}
 	public void setRespcontent(String respcontent) {
-		this.respcontent4 = respcontent;
+		this.panDtlsRespContent = respcontent;
 	}
 	
 	

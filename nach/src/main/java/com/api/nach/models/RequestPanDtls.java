@@ -17,17 +17,17 @@ public class RequestPanDtls {
 	@Id
 	@Column(name="unique_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id1;
+	private int panDtlsUniqueReqId;
 	@Column(name="service_name")
-	private String servicename1;
+	private String panDtlsServiceName;
 	@Column(name="request_timestamp")
-	private String rqsttimestamp1;
+	private String panDtlsReqTimestamp;
 	@Column(name="request_id")
-	private String rqstid1;
+	private String panDtlsReqId;
 	@Column(name="npciref_id")
-	private String npcirefid1;
+	private String panDtlsNpciRefId;
 	@Column(name="request_content")
-	private String rqstcontent1;
+	private String panDtlsReqContent;
 	
 	
 	
@@ -38,40 +38,40 @@ public class RequestPanDtls {
 	
 	
 	public int getId() {
-		return id1;
+		return panDtlsUniqueReqId;
 	}
 	public void setId(int id) {
-		this.id1 = id;
+		this.panDtlsUniqueReqId = id;
 	}
 	public String getServicename() {
-		return servicename1;
+		return panDtlsServiceName;
 	}
 	public void setServicename(String servicename) {
-		this.servicename1 = servicename;
+		this.panDtlsServiceName = servicename;
 	}
 	public String getRqsttimestamp() {
-		return rqsttimestamp1;
+		return panDtlsReqTimestamp;
 	}
 	public void setRqsttimestamp(String rqsttimestamp) {
-		this.rqsttimestamp1 = rqsttimestamp;
+		this.panDtlsReqTimestamp = rqsttimestamp;
 	}
 	public String getRqstid() {
-		return rqstid1;
+		return panDtlsReqId;
 	}
 	public void setRqstid(String rqstid) {
-		this.rqstid1 = rqstid;
+		this.panDtlsReqId = rqstid;
 	}
 	public String getNpcirefid() {
-		return npcirefid1;
+		return panDtlsNpciRefId;
 	}
 	public void setNpcirefid(String npcirefid) {
-		this.npcirefid1 = npcirefid;
+		this.panDtlsNpciRefId = npcirefid;
 	}
 	public String getRqstcontent() {
-		return rqstcontent1;
+		return panDtlsReqContent;
 	}
 	public void setRqstcontent(String rqstcontent) {
-		this.rqstcontent1 = rqstcontent;
+		this.panDtlsReqContent = rqstcontent;
 	}
 
 }
