@@ -1,22 +1,35 @@
 package com.api.nach.services;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.jsp.tagext.TryCatchFinally;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -24,6 +37,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,11 +60,12 @@ import com.api.nach.repos.ResponseRepositoryAcctStatus;
 @Component
 public class AccountService extends Thread{
 	
-
-	@Autowired
+	private xmlSigning signData = new xmlSigning();
+	
+	/*@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 	
-	private static final String TOPIC = "kafka_demo";
+	private static final String TOPIC = "kafka_demo";*/
 	
 	@Autowired
 	private RequestRepositoryPanDtls requestRepositoryPanDtls;
@@ -70,9 +85,16 @@ public class AccountService extends Thread{
 	@Autowired
 	private ResponseRepositoryAcctStatus responseRepositoryAcctStatus;
 	
+	@Value("${fi.url}")
+	String fiUrl = "";
+	
+	@Value("${npci.url}")
+	String npciUrl = "";
+	
 	String panDtlsService = "GetPanDtls";
 	String acctHoldrService = "GetAccHolder";
 	String acctStatusService = "GetAccStatus";
+	String resType="Response";
 	String panDtlsAcctHolder ="";
 	String panDtlsAcctHolders="";
 	String panDtlsResp="";
@@ -83,10 +105,17 @@ public class AccountService extends Thread{
 	String acctStatusResp="";
 	static String acctTypeFi = "";
 	static String fiMsg= "";
-	
+	RestTemplate restTemplate = new RestTemplate();
 	private static Map<String, String> fiCustNamePan = new LinkedHashMap<String, String>();
 	private static Map<String, String> fiCustNameIfsc = new LinkedHashMap<String, String>();
 	private Map<String, String> acctTypesFi = new LinkedHashMap<String, String>();
+	
+	String publicKeyFile = "keys" + File.separator + "npcipublic.pem";
+	
+	dataEncryption encryptData = new dataEncryption();
+	
+	
+	
 	
 	public AccountService() {
 		
@@ -108,9 +137,12 @@ public class AccountService extends Thread{
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountService.class);
 	
 	
-	public String getPanDtls(String request){
+	public String getPanDtls(String request) throws Exception{
 		
-		
+		String currentWorkingDir = System.getProperty("user.dir");
+        logger.info("Current Working Directory"+currentWorkingDir);
+		logger.info("Finacle url is" +fiUrl);
+		logger.info("Nach url is" +npciUrl);
 		RequestPanDtls requestPanDtls = new RequestPanDtls();
 		ResponsePanDtls responsePanDtls = new ResponsePanDtls();
 		String xmlContent = "";
@@ -121,8 +153,10 @@ public class AccountService extends Thread{
 		String destName = "";
 		String npciRefId = "";
 		String reqId="";
-		String reqType="";
+		
 		String reqTimestamp = "";
+		String xmlDataUnsigned = "";
+		String xmlDataSigned = "";
 		panDtlsAcctHolder ="";
 		panDtlsAcctHolders="";
 		panDtlsResp="";
@@ -136,11 +170,16 @@ public class AccountService extends Thread{
 		String respTimestamp = dateFormat.format(date);
 		String requestData = request;
 		
+		//passing public key filepath
+		PublicKey publicKey = encryptData.readPublicKey(publicKeyFile);
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
-		//System.out.println(xmlContent);
+		
+		
+		String npciResponse="";
 		try {
+			
 			builder = factory.newDocumentBuilder();
 			Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
 			Element root = document.getDocumentElement();
@@ -235,7 +274,11 @@ public class AccountService extends Thread{
 			
 			for(int i=0;i<panDtlsCustNames.size();i++) {
 				
-				panDtlsAcctHolder = "<AccHolder pan=\""+panDtlsCustPanNos.get(i)+"\"name=\""+panDtlsCustNames.get(i)+"\"/>\r\n";
+				//Encryption using public key
+				byte[] panDtls = panDtlsCustPanNos.get(i).getBytes();
+				String encryptedPanDtls = encryptData.encrypt(publicKey, panDtls);
+				//panDtlsAcctHolder = "<AccHolder pan=\""+panDtlsCustPanNos.get(i)+"\" name=\""+panDtlsCustNames.get(i)+"\" />\r\n";
+				panDtlsAcctHolder = "<AccHolder pan=\""+encryptedPanDtls+"\" name=\""+panDtlsCustNames.get(i)+"\" />\r\n";
 				panDtlsFinal.add(panDtlsAcctHolder);
 				panDtlsAcctHolders = panDtlsAcctHolders + panDtlsFinal.get(i);
 				
@@ -243,10 +286,10 @@ public class AccountService extends Thread{
 		}
 		else {
 			
-			panDtlsAcctHolders = "<AccHolder pan=\""+panDtlsCustPanNos.get(0)+"\"name=\""+panDtlsCustNames.get(0)+"\"/>\r\n";
+			panDtlsAcctHolders = "<AccHolder pan=\""+panDtlsCustPanNos.get(0)+"\" name=\""+panDtlsCustNames.get(0)+"\" />\r\n";
 		}
 		
-		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'Response','Message':'<ach:GetPanDtlsResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+		xmlDataUnsigned="<ach:GetPanDtlsResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
 				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
 				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
 				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
@@ -258,7 +301,16 @@ public class AccountService extends Thread{
 				panDtlsAcctHolders+
 				"	</AccHolderList>\r\n" + 
 				"</RespData>\r\n" + 
-				"</ach:GetPanDtlsResp>'}";
+				"</ach:GetPanDtlsResp>";
+		
+		
+		
+		//xml signing
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		
+		
+		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+ "'}";
+		
 		
 		responsePanDtls.setId(requestRepositoryPanDtls.findByReqId(reqId));
 		responsePanDtls.setServicename(panDtlsService);
@@ -268,19 +320,38 @@ public class AccountService extends Thread{
 		responsePanDtls.setRespcontent(panDtlsResp);
 		responseRepositoryPanDtls.save(responsePanDtls);
 		
-		kafkaTemplate.send(TOPIC, panDtlsResp);
-		return getPanDtlsAck();
+		//Base64 Conversion
+		
+		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
+		destValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(destValue.getBytes()));
+		panDtlsService = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(panDtlsService.getBytes()));
+		resType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(resType.getBytes()));
+		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+ "'}";
+		
+		//kafkaTemplate.send(TOPIC, panDtlsResp);
+		
+		
+		//Sending original response to URL
+		sendPanDtlsResp(panDtlsResp);
+		
+		
+		//Sending ack for request
+		return getPanDtlsAck(reqId);
+		
+		//return panDtlsResp;
+		
+		
+		
 		}
 		else {
 			
-			return getPanDtlsNack();
+			return getPanDtlsNack(reqId);
 		}
-		
 		
 		
 	}
 	
-	public String getAcctHolderName(String request) {
+	public String getAcctHolderName(String request) throws Exception {
 		RequestAcctHoldr request2 = new RequestAcctHoldr();
 		
 		
@@ -296,6 +367,8 @@ public class AccountService extends Thread{
 		String reqId="";
 		String reqType="";
 		String reqTimestamp = "";
+		String xmlDataUnsigned = "";
+		String xmlDataSigned = "";
 		//System.out.println("request data is" +request);
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -311,7 +384,7 @@ public class AccountService extends Thread{
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
-		//System.out.println(xmlContent);
+		
 		try {
 			builder = factory.newDocumentBuilder();
 			Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
@@ -404,7 +477,7 @@ public class AccountService extends Thread{
 				
 				logger.info("Account holder "+ acctHoldrCustName.get(i));
 				
-				acctHolderName = "<AccHolder name=\""+acctHoldrCustName.get(i)+"\" />\r\n";
+				acctHolderName = "<AccHolder> name=\""+acctHoldrCustName.get(i)+"\" </AccHolder>\r\n";
 				acctHoldrCustNames.add(acctHolderName);
 				acctHolderNames = acctHolderNames + acctHoldrCustNames.get(i);
 				
@@ -412,10 +485,13 @@ public class AccountService extends Thread{
 		}
 		else {
 			
-			acctHolderNames = "<AccHolder name=\""+acctHoldrCustName.get(0)+"\" />\r\n";
+			acctHolderNames = "<AccHolder> name=\""+acctHoldrCustName.get(0)+"\" </AccHolder>\r\n";
 		}
 		
-		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'Response','Message':'<ach:GetAccHolderResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+		
+		
+		
+		xmlDataUnsigned = "<ach:GetAccHolderResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
 				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
 				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
 				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
@@ -427,28 +503,45 @@ public class AccountService extends Thread{
 				"	</AccHolderList>\r\n" + 
 				"  </RespData>\r\n" + 
 				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
-				"</ach:GetAccHolderResp>'}";
+				"</ach:GetAccHolderResp>";
 		
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		
+		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
 		response2.setId(requestRepositoryAcctHoldr.findByReqId(reqId));
-		response2.setServicename(panDtlsService);
+		response2.setServicename(acctHoldrService);
 		response2.setResptimestamp(respTimestamp);
 		response2.setRqstid(reqId);
 		response2.setNpcirefid(npciRefId);
 		response2.setRespcontent(acctHolderResp);
 		responseRepositoryAcctHoldr.save(response2);
 		
-		kafkaTemplate.send(TOPIC, acctHolderResp);
-		return getAcctHolderAck();
+		//Base64 Conversion
+		
+		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
+		destValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(destValue.getBytes()));
+		acctHoldrService = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(acctHoldrService.getBytes()));
+		resType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(resType.getBytes()));
+		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
+		//kafkaTemplate.send(TOPIC, acctHolderResp);
+		
+		
+		sendAcctHolderResp(acctHolderResp);
+		
+		return getAcctHolderAck(reqId);
+		
+		
+		
 		}
 		else {
 			
-			return getAcctHolderNack();
+			return getAcctHolderNack(reqId);
 		}
 		
 	}
 	
-	public String getAcctStatus(String request) {
+	public String getAcctStatus(String request) throws Exception {
 		RequestAcctStatus request3 = new RequestAcctStatus();
 		ResponseAcctStatus response3 = new ResponseAcctStatus();
 		String xmlContent = "";
@@ -461,7 +554,10 @@ public class AccountService extends Thread{
 		String reqId="";
 		String reqType="";
 		String reqTimestamp = "";
-		//System.out.println("request data is" +request);
+		
+		String xmlDataUnsigned = "";
+		String xmlDataSigned = "";
+		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
@@ -477,7 +573,7 @@ public class AccountService extends Thread{
 			builder = factory.newDocumentBuilder();
 			Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
 			Element root = document.getDocumentElement();
-			System.out.println("Root node is "+root.getNodeName());
+			logger.info("Root node is "+root.getNodeName());
 			
 			NodeList nListDtl = document.getElementsByTagName("Detail");
 			NodeList nListRefId = document.getElementsByTagName("NpciRefId");
@@ -486,7 +582,7 @@ public class AccountService extends Thread{
 			NodeList nListReq = document.getElementsByTagName("Request");
 			NodeList nListHead = document.getElementsByTagName("Head");
 			
-			System.out.println("Node list length "+nListDtl.getLength());
+			logger.info("Node list length "+nListDtl.getLength());
 			
 			for(int i=0;i<nListDtl.getLength();i++) {
 				
@@ -548,9 +644,9 @@ public class AccountService extends Thread{
 		acctTypeFi = "SBA";
 		fiMsgList.add("Account Found");
 		if(fiMsgList.get(0).equals("Account Found")) {
-		acctStatusType = "<Account type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" />\r\n";
+		acctStatusType = "<Account> type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" </Account>\r\n";
 		
-		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'Response','Message':'<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
+		xmlDataUnsigned = "<ach:GetAccStatusResp xmlns:ach=\"http://npci.org/ach/schema/\">\r\n" + 
 				"  <Head ts=\""+respTimestamp+"\" ver=\"1.0\"/>\r\n" + 
 				"  <Source name=\""+sourceName+"\" type=\"CODE\" value=\""+sourceValue+"\"/>\r\n" + 
 				"  <Destination name=\""+destName+"\" type=\"CODE\" value=\""+destValue+"\"/>\r\n" + 
@@ -560,35 +656,51 @@ public class AccountService extends Thread{
 				"<RespData>\r\n" + 
 				acctStatusType+ 
 				"</RespData>\r\n" + 
-				"</ach:GetAccStatusResp>'}";
+				"</ach:GetAccStatusResp>";
+		
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		
+		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
 		response3.setId(requestRepositoryAcctStatus.findByReqId(reqId));
-		response3.setServicename(panDtlsService);
+		response3.setServicename(acctStatusService);
 		response3.setResptimestamp(respTimestamp);
 		response3.setRqstid(reqId);
 		response3.setNpcirefid(npciRefId);
 		response3.setRespcontent(acctStatusResp);
 		responseRepositoryAcctStatus.save(response3);
 		
+		//Base64 Conversion
+		
+		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
+		destValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(destValue.getBytes()));
+		acctStatusService = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(acctHoldrService.getBytes()));
+		resType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(resType.getBytes()));
+		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
 		
-		kafkaTemplate.send(TOPIC, acctStatusResp);
-		return getAcctStatusAck();
+		//kafkaTemplate.send(TOPIC, acctStatusResp);
+		
+		sendAcctStatusResp(acctStatusResp);
+		
+		return getAcctStatusAck(reqId);
+		
+		//return acctStatusResp;
 		}
 		else {
-			return getAcctStatusNack();
+			return getAcctStatusNack(reqId);
 		}
 		
 		
 		
 	}
 	
-	synchronized static void getDataFi(String acctNo) throws InterruptedException{
+	synchronized void getDataFi(String acctNo) throws InterruptedException{
 		
 		String custPan = "";
 		String custName = "";
 		
-		String fiUrl = "";
+		
 		
 		String ifscCodeFi = "";
 		fiCustNamePan.clear();
@@ -597,13 +709,14 @@ public class AccountService extends Thread{
 			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
+			SSLAuth.doTrustToCertificates();
 			Document document = db.parse(new URL(fiUrl).openStream());
 			document.getDocumentElement().normalize();
 			
 			fiMsg = document.getElementsByTagName("msg").item(0).getTextContent();
 			
 			NodeList nList = document.getElementsByTagName("acctHolderDtls");
-			System.out.println("Nodelist length is "+nList.getLength());
+			logger.info("Nodelist length is "+nList.getLength());
 			
 			acctTypeFi = document.getElementsByTagName("accttype").item(0).getTextContent();
 			ifscCodeFi = document.getElementsByTagName("brIFSCCode").item(0).getTextContent();
@@ -620,6 +733,7 @@ public class AccountService extends Thread{
 					
 					fiCustNamePan.put(custName, custPan);
 					fiCustNameIfsc.put(custName, ifscCodeFi);
+					fiMsgList.add(fiMsg);
 					
 				}
 			}
@@ -636,13 +750,14 @@ public class AccountService extends Thread{
 		
 	}
 	
-	public String getPanDtlsAck() {
+	public String getPanDtlsAck(String reqId) {
 		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
 		String ackData = "{'Source':'Demo','Service':'GetPanDtls','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
+				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
 				"</nachapi:GatewayAck>'}";
 		
@@ -651,13 +766,14 @@ public class AccountService extends Thread{
 		
 	}
 	
-	public String getPanDtlsNack() {
+	public String getPanDtlsNack(String reqId) {
 		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
 		String nackData = "{'Source':'Demo','Service':'GetPanDtls','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
+				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
 				"</nachapi:GatewayAck>'}";
 		
@@ -666,13 +782,14 @@ public class AccountService extends Thread{
 		
 	}
 	
-	public String getAcctHolderAck() {
+	public String getAcctHolderAck(String reqId) {
 		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
 		String ackData = "{'Source':'Demo','Service':'GetAccHolder','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
+				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
 				"</nachapi:GatewayAck>'}";
 		
@@ -681,13 +798,14 @@ public class AccountService extends Thread{
 		
 	}
 	
-	public String getAcctHolderNack() {
+	public String getAcctHolderNack(String reqId) {
 		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
 		String nackData = "{'Source':'Demo','Service':'GetAccHolder','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
+				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
 				"</nachapi:GatewayAck>'}";
 		
@@ -696,13 +814,14 @@ public class AccountService extends Thread{
 		
 	}
 
-	public String getAcctStatusAck() {
+	public String getAcctStatusAck(String reqId) {
 	
 	Date date = Calendar.getInstance().getTime();
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	String ackTimestamp = dateFormat.format(date);
 	String ackData = "{'Source':'Demo','Service':'GetAccStatus','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 			"<NpciRefId value=\"\"/>\r\n"+
+			"<Request id=\""+reqId+"\"/>\r\n"+
 			"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
 			"</nachapi:GatewayAck>'}";
 	
@@ -711,19 +830,44 @@ public class AccountService extends Thread{
 	
 }
 	
-	public String getAcctStatusNack() {
+	public String getAcctStatusNack(String reqId) {
 		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
 		String nackData = "{'Source':'Demo','Service':'GetAccStatus','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
+				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
 				"</nachapi:GatewayAck>'}";
 		
 		return nackData;
 			
 		
+	}
+	
+	public void sendPanDtlsResp(String response) throws Exception{
+		
+		logger.info("In pan details");
+		SSLAuth.doTrustToCertificates();
+		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
+		logger.info("Ack response for panDtlsService "+ npciResponse);
+	}
+	
+	public void sendAcctHolderResp(String response) throws Exception {
+		
+		logger.info("In acct holder");
+		SSLAuth.doTrustToCertificates();
+		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
+		logger.info("Ack response for acctHolderService "+ npciResponse);
+	}
+
+	public void sendAcctStatusResp(String response) throws Exception {
+		
+		logger.info("In acct status");
+		SSLAuth.doTrustToCertificates();
+		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
+		logger.info("Ack response for acctStatusService "+ npciResponse);
 	}
 	
 	

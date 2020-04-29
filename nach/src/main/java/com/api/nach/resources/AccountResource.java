@@ -1,6 +1,14 @@
 package com.api.nach.resources;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
@@ -66,7 +74,7 @@ public class AccountResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetPanDtls")
 	@ResponseStatus(HttpStatus.OK)
-	public String getPanDtlsRqst(@RequestBody String acctinfo) {
+	public String getPanDtlsRqst(@RequestBody String acctinfo) throws Exception {
 		
 		
 		//kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
@@ -84,7 +92,7 @@ public class AccountResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccHolder")
 	@ResponseStatus(HttpStatus.OK)
-	public String getAcctHolderRqst(@RequestBody String acctinfo) {
+	public String getAcctHolderRqst(@RequestBody String acctinfo) throws Exception {
 		
 		//kafkaTemplate.send(TOPIC, accountService.getAcctHolderName(acctinfo));
 		//String respData = accountService.getAcctHolderAck();
@@ -99,7 +107,7 @@ public class AccountResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccStatus")
 	@ResponseStatus(HttpStatus.OK)
-	public String getAcctStatusRqst(@RequestBody String acctinfo) {
+	public String getAcctStatusRqst(@RequestBody String acctinfo) throws Exception {
 		//kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
 		//String respData = accountService.getAcctHolderAck();
 		String respData = accountService.getAcctStatus(acctinfo);
@@ -157,6 +165,10 @@ public class AccountResource {
 	
 		return responseRepositoryAcctStatus.findByServiceName();
 	}
+	
+	
+	
+	
 	
 	
 	
