@@ -110,7 +110,7 @@ public class AccountService extends Thread{
 	private static Map<String, String> fiCustNameIfsc = new LinkedHashMap<String, String>();
 	private Map<String, String> acctTypesFi = new LinkedHashMap<String, String>();
 	
-	String publicKeyFile = "keys" + File.separator + "npcipublic.pem";
+	String publicKeyFile = "keys" + File.separator + "public.pem";
 	
 	dataEncryption encryptData = new dataEncryption();
 	
