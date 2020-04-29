@@ -12,7 +12,7 @@ import com.api.nach.models.ResponseAcctStatus;
 
 public interface ResponseRepositoryAcctStatus extends JpaRepository<ResponseAcctStatus, Integer>{
 	
-	@Query(value = "SELECT * from response where service_name='GetAccStatus'", nativeQuery = true)
+	@Query(value = "SELECT * from acct_RES_data_OUT where service_name='GetAccStatus'", nativeQuery = true)
 	  List<ResponseAcctStatus> findByServiceName();
 
 }

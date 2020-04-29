@@ -12,7 +12,7 @@ import com.api.nach.models.ResponseAcctHoldr;
 
 public interface ResponseRepositoryAcctHoldr extends JpaRepository<ResponseAcctHoldr, Integer>{
 	
-	@Query(value = "SELECT * from response where service_name='GetAccHolder'", nativeQuery = true)
+	@Query(value = "SELECT * from acct_RES_data_OUT where service_name='GetAccHolder'", nativeQuery = true)
 	  List<ResponseAcctHoldr> findByServiceName();
 
 }

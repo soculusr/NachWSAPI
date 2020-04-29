@@ -11,21 +11,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Entity
-@Table(name="response")
+@Table(name="acct_RES_data_OUT")
 public class ResponseAcctHoldr {
 	
 	@Id
-	@Column(name="unique_id")
+	@Column(name="UNIQUE_ID")
 	private int acctHoldrUniqueRespId;
-	@Column(name="service_name")
+	@Column(name="SERVICE_NAME")
 	private String acctHoldrRespServiceName;
-	@Column(name="response_timestamp")
+	@Column(name="RES_TIMESTAMP")
 	private String acctHoldrRespTimestamp;
-	@Column(name="request_id")
+	@Column(name="REQ_ID")
 	private String acctHoldrResReqId;
-	@Column(name="npciref_id")
+	@Column(name="NPCIREF_VALUE")
 	private String acctHoldrRespNpciRefId;
-	@Column(name="response_content")
+	@Column(name="RES_CONTENT")
 	private String respcontent5;
 	
 	

@@ -10,7 +10,7 @@ import com.api.nach.models.ResponsePanDtls;
 
 public interface ResponseRepositoryPanDtls extends JpaRepository<ResponsePanDtls, Integer>{
 	
-	@Query(value = "SELECT * from response where service_name='GetPanDtls'", nativeQuery = true)
+	@Query(value = "SELECT * from acct_RES_data_OUT where service_name='GetPanDtls'", nativeQuery = true)
 	  List<ResponsePanDtls> findByServiceName();
 
 }
