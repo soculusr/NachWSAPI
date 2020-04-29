@@ -2,6 +2,8 @@ package com.api.nach.services;
 
 import org.slf4j.Logger;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
 
 public class NpciConsumerService {
 	
