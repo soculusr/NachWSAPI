@@ -16,7 +16,7 @@ public class AadhaarReqOutResource {
 	AadhaarReqOutService aadhaarService = new AadhaarReqOutService();
 	
 	@PostMapping("/AadhaarSeedingResp")
-	@ResponseStatus(HttpStatus.CREATED)
+	@ResponseStatus(HttpStatus.ACCEPTED)
 	public String aadhaarSeeding(@RequestBody String request) {
 		
 		
@@ -27,15 +27,15 @@ public class AadhaarReqOutResource {
 	}
 	
 	@PostMapping("/AadhaarSeedingReq")
-	public String aadhaarSeedingTest(@RequestBody String request) throws Exception {
+	public void aadhaarSeedingTest(@RequestBody String request) throws Exception {
 		
 		
 		//kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
 		//String respData = accountService.getPanDtlsAck();
-		String respData = aadhaarService.aadharSeedingRequest(request);
+		aadhaarService.aadharSeedingRequest(request);
 		
 		
-		return respData;
+		
 	}
 	
 	
