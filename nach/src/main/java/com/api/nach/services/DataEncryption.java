@@ -52,7 +52,7 @@ public class DataEncryption {
 	    return keyFactory.generatePrivate(keySpec);     
 	}
 	
-	public static String encrypt(PublicKey key, byte[] plaintext) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
+	public String encrypt(PublicKey key, byte[] plaintext) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
 	{
 	    Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");   
 	    cipher.init(Cipher.ENCRYPT_MODE, key);

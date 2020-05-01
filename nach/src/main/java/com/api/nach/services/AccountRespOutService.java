@@ -85,6 +85,15 @@ public class AccountRespOutService extends Thread{
 	@Value("${public.cert}")
 	String publicCertificate="";
 	
+	@Value("${keystore.path}")
+	String KeyStoreFilePath = "";
+	
+	@Value("${keystore.pass}")
+	String KeyStorePass = "";
+	
+	@Value("${keystore.alias}")
+	String KeyStoreAlias = "";
+	
 	String panDtlsService = "GetPanDtls";
 	String acctHoldrService = "GetAccHolder";
 	String acctStatusService = "GetAccStatus";
@@ -104,7 +113,7 @@ public class AccountRespOutService extends Thread{
 	private static Map<String, String> fiCustNameIfsc = new LinkedHashMap<String, String>();
 	private Map<String, String> acctTypesFi = new LinkedHashMap<String, String>();
 	
-	String publicKeyFile = "keys" + File.separator + publicCertificate;
+	//String publicKeyFile = "keys" + File.separator + "public.pem";
 	
 	DataEncryption encryptData = new DataEncryption();
 	
@@ -137,6 +146,7 @@ public class AccountRespOutService extends Thread{
         logger.info("Current Working Directory"+currentWorkingDir);
 		logger.info("Finacle url is" +fiUrl);
 		logger.info("Nach url is" +npciUrl);
+		logger.info("Keystore is "+KeyStoreFilePath);
 		PanDtlsReqIn requestPanDtls = new PanDtlsReqIn();
 		PanDtlsRespOut responsePanDtls = new PanDtlsRespOut();
 		String xmlContent = "";
@@ -165,7 +175,7 @@ public class AccountRespOutService extends Thread{
 		String requestData = request;
 		
 		//passing public key filepath
-		PublicKey publicKey = encryptData.readPublicKey(publicKeyFile);
+		PublicKey publicKey = encryptData.readPublicKey(publicCertificate);
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
@@ -300,7 +310,7 @@ public class AccountRespOutService extends Thread{
 		
 		
 		//xml signing
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
 		
 		
 		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+ "'}";
@@ -499,7 +509,7 @@ public class AccountRespOutService extends Thread{
 				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
 				"</ach:GetAccHolderResp>";
 		
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
 		
 		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
@@ -652,7 +662,7 @@ public class AccountRespOutService extends Thread{
 				"</RespData>\r\n" + 
 				"</ach:GetAccStatusResp>";
 		
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
 		
 		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
