@@ -28,7 +28,7 @@ import com.api.nach.services.AadhaarReqOutService;
 import com.api.nach.services.AccountRespOutService;
 
 @Controller
-public class AadhaarRepOutController {
+public class AadhaarReqOutController {
 	
 	@Autowired
 	private PrevIinListRepository prevIinRepo;
@@ -38,7 +38,7 @@ public class AadhaarRepOutController {
 	AadhaarReqOutService aadhaarService;
 	
 	
-	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AadhaarRepOutController.class);
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AadhaarReqOutController.class);
 	
 
 	@GetMapping(value="/home")
