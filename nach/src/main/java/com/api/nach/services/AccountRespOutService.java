@@ -181,7 +181,7 @@ public class AccountRespOutService extends Thread{
 		DocumentBuilder builder;
 		
 		
-		String npciResponse="";
+		String npciResponse=""; 
 		try {
 			
 			builder = factory.newDocumentBuilder();

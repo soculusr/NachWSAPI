@@ -51,16 +51,25 @@ public class AadhaarReqOutService {
 	@Value("${public.cert}")
 	String publicCertificate="";
 	
+	@Value("${keystore.path}")
+	String KeyStoreFilePath = "";
+	
+	@Value("${keystore.pass}")
+	String KeyStorePass = "";
+	
+	@Value("${keystore.alias}")
+	String KeyStoreAlias = "";
+	
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountRespOutService.class);
 	
 	private XmlSigning signData = new XmlSigning();
 	public void aadharSeedingRequest(String request) throws Exception {
 		
-		String publicKeyFile = "keys" + File.separator + publicCertificate;
+		//String publicKeyFile = "keys" + File.separator + publicCertificate;
 		
 		DataEncryption encryptData = new DataEncryption();
 		
-		PublicKey publicKey = encryptData.readPublicKey(publicKeyFile);
+		PublicKey publicKey = encryptData.readPublicKey(publicCertificate);
 		
 		
 		String [] dataList = request.split(",");
@@ -127,7 +136,7 @@ public class AadhaarReqOutService {
 				"</ach:AadhaarSeedingRqst>";
 		
 		
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned);
+		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
 		
 		//logger.info("Signed aadhaar data"+xmlDataSigned);
 		
