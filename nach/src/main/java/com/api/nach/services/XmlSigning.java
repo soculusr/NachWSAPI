@@ -129,7 +129,7 @@ public class XmlSigning {
 	        keyInfo = keyInfoFact.newKeyInfo(Collections.singletonList(keyValue));
 	    
 	        
-	        //Create a new XML Signature
+	        //Create a new XML  Signature
 	        XMLSignature xmlSignature = xmlSigFactory.newXMLSignature(signedInfo, keyInfo);
 	        try {
 	            //Sign the document
