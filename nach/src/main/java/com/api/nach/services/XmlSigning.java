@@ -1,34 +1,23 @@
 package com.api.nach.services;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyException;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertStore;
 import java.security.cert.Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.Collections;
-
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
@@ -48,19 +37,24 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-@Service
+
+
+@Component
 public class XmlSigning {
 	
-	public static String getSignedData(String xmlData) {
+	
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(XmlSigning.class);
+	
+	public String getSignedData(String xmlData, String KeyStoreFilePath, String KeyStorePass, String AliasName) throws IOException {
 		
+		logger.info("Keystore is "+KeyStoreFilePath);
 		
-		String FilePath = "keys" + File.separator + "nayan.p12";
 		String signedData  = null;
 		KeyInfo keyInfo = null;
         KeyValue keyValue = null;
@@ -69,6 +63,7 @@ public class XmlSigning {
 			//load the xml doc to sign
 			
 			DocumentBuilderFactory docBuildFac = DocumentBuilderFactory.newInstance();
+			docBuildFac.setNamespaceAware(true);
 			DocumentBuilder docBuild = docBuildFac.newDocumentBuilder();
 	
 			Document xmlDoc = docBuild.parse(new InputSource(new StringReader(xmlData)));
@@ -79,7 +74,7 @@ public class XmlSigning {
 			
 			char[] password = "nayan123".toCharArray();
 			
-			keystore.load(new FileInputStream(FilePath),password);
+			keystore.load(new FileInputStream(KeyStoreFilePath),password);
 			
 			String aliasName = "mykey";
 			Certificate cert = keystore.getCertificate(aliasName);
@@ -140,14 +135,13 @@ public class XmlSigning {
 	            ex.printStackTrace();
 	        }
 	        
-	       
+	       //Converting signed data to string format
 	        DOMSource domSource = new DOMSource(xmlDoc);
 			StringWriter writer = new StringWriter();
 			StreamResult result = new StreamResult(writer);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
 			transformer.transform(domSource, result);
-			//System.out.println("XML IN String format is: \n" + writer.toString());
 			signedData = writer.toString();
 			
 		} catch (Exception e) {
@@ -159,93 +153,18 @@ public class XmlSigning {
 		return signedData;
 	}
 	
-	private static byte[] getKeyData(String filePath) {
-        File file = new File(filePath);
-        byte[] buffer = new byte[(int) file.length()];
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            fis.read(buffer);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return buffer;
-    }
-	
-	public PrivateKey getStoredPrivateKey(String filePath) {
-		
-		PrivateKey privateKey = null;
-        byte[] keydata = getKeyData(filePath);
-        PKCS8EncodedKeySpec encodedPrivateKey = new PKCS8EncodedKeySpec(keydata);
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        try {
-            privateKey = keyFactory.generatePrivate(encodedPrivateKey);
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return privateKey;
-    }
-	
-	public static PublicKey getStoredPublicKey(String filePath) {
-		
-		/*String publicKeyData = "-----BEGIN PUBLIC KEY-----\r\n"  + 
-				"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp/6IUw9H2VdWPpM6pP9k\r\n" + 
-				"pCylsECejWlieo+I00kcAHVNN+oyUNJ2vcuen3OSsIPh1byrsaU6ku0AxXWhr3qf\r\n" + 
-				"0uAAfCTeVRpZjaoDPLVCX/F+gu+4xXeErfttg0syOX6DdeNWucW1ja231pQGGZis\r\n" + 
-				"iTfFdJ0aWn4Tc15DaxIkqhdWYBiGrNT9cCuzXNo3g2UIvhKJh5/Dr1GVV4SXlBC3\r\n" + 
-				"L/O7lc1iGPq/utq0uIZRLEC+e9M/EzH22psV7E99qMS6DPhg5rn6m0iP3K34iM5M\r\n" + 
-				"tRogTGxuluN4TjrYTm9tsSfPd2guoRKF3aEg5yIaS02X05hPVD2DyseBqZK/Exug\r\n" + 
-				"zwIDAQAB\r\n" + 
-				"-----END PUBLIC KEY-----";
-		
-		String pubKeyPEM = publicKeyData.replace("-----BEGIN PUBLIC KEY-----\r\n", "").replace("-----END PUBLIC KEY-----", "");
-		
-		byte[] encodedPublicKeyData = Base64.getMimeDecoder().decode(pubKeyPEM);*/
-        PublicKey publicKey = null;
-        byte[] keydata = getKeyData(filePath);
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        X509EncodedKeySpec encodedPublicKey = new X509EncodedKeySpec(keydata);
-        try {
-            publicKey = keyFactory.generatePublic(encodedPublicKey);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return publicKey;
-    }
-	
-	public static boolean isXmlDigitalSignatureValid(String signedXmlData) throws Exception {
-		String FilePath = "keys" + File.separator + "nayan.p12";
-		//String pubicKeyFilePath = "keys" + File.separator + "publickey.pem";
+	public boolean isSignatureValid(String signedXmlData,String KeyStoreFilePath, String KeyStorePass, String AliasName) throws Exception {
+		//String FilePath = "keys" + File.separator + "nayan.p12";
 		
 		KeyStore keystore = KeyStore.getInstance("PKCS12");
 		
-		char[] password = "nayan123".toCharArray();
+		//char[] password = "nayan123".toCharArray();
+		char[] password = KeyStorePass.toCharArray();
 		
-		keystore.load(new FileInputStream(FilePath),password);
+		keystore.load(new FileInputStream(KeyStoreFilePath),password);
 		
-		String aliasName = "mykey";
+		//String aliasName = "mykey";
+		String aliasName = AliasName;
 		Certificate cert = keystore.getCertificate(aliasName);
 		PublicKey publicKey = cert.getPublicKey();
 		System.out.println("Public 1 "+publicKey);
@@ -277,7 +196,7 @@ public class XmlSigning {
 			}
 	
 	
-	public static void main(String[] args) throws Exception {
+	/*public static void main(String[] args) throws Exception {
 		
 		String xml = "<ach:GetPanDtlsRqst xmlns:ach=\"http://npci.org/ach/schema/\" >\r\n" + 
 				"			<Head ver=\"1.0\" ts=\"2018-02-12T10:11:00\" />	\r\n" + 
@@ -298,6 +217,6 @@ public class XmlSigning {
 		System.out.println("Verify status is" + flag);
 		
 		
-	}
+	}*/
 
 }
