@@ -203,7 +203,7 @@ public class XmlSigning {
 	
 	public static PublicKey getStoredPublicKey(String filePath) {
 		
-		/*String publicKeyData = "-----BEGIN PUBLIC KEY-----\r\n" + 
+		/*String publicKeyData = "-----BEGIN PUBLIC KEY-----\r\n"  + 
 				"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp/6IUw9H2VdWPpM6pP9k\r\n" + 
 				"pCylsECejWlieo+I00kcAHVNN+oyUNJ2vcuen3OSsIPh1byrsaU6ku0AxXWhr3qf\r\n" + 
 				"0uAAfCTeVRpZjaoDPLVCX/F+gu+4xXeErfttg0syOX6DdeNWucW1ja231pQGGZis\r\n" + 
