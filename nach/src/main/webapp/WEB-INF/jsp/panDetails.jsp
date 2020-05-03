@@ -32,7 +32,7 @@
 			
 			$("#errmsg").html("Atleast one record should be present").show().fadeOut(2500);
 			setTimeout(function() {
-				  $(location).attr('href', 'http://localhost:8080/home2');
+				  $(location).attr('href', 'http://localhost:8080/home4');
 			  }, 2500);
 		}
 		else{ 
@@ -45,7 +45,7 @@
 			data.push(data2);
 		}
 		
-		var data4 = $("#previin1").val();
+		var data4 = $("#destbank1").val();
 		data.push(data4);
 		
 		
@@ -56,7 +56,7 @@
 		$.ajax({
 	        type: "POST",
 	        traditional: true,
-	        url: "/acctHolderDtls",
+	        url: "/panDtls",
 	        data: finaldata,
 	      });
 		
@@ -70,7 +70,7 @@
 		
 		$(document).ready(function() {
 			  setTimeout(function() {
-				  $(location).attr('href', 'http://localhost:8080/home2');
+				  $(location).attr('href', 'http://localhost:8080/home4');
 			  }, 3000);
 			}
 		
@@ -173,11 +173,11 @@ label {
     <input type="hidden" class="form-control mb-2 mr-sm-2" id="accountno" placeholder="Enter account no" name="accountno" value="1">
    </div>
    
-    <div class="col" id="previinCol"> 
+    <div class="col" id="destBankCol"> 
     <label for="previin" class="mb-2 mr-sm-2">Destination:</label>
-    <form:select required="on" style="min-width: 120%" class="form-control mb-2 mr-sm-2" id="previin1" name="previin1" path = "previinlist">
+    <form:select required="on" style="min-width: 120%" class="form-control mb-2 mr-sm-2" id="destbank1" name="destbank1" path = "destBankList">
         <form:option value = "" label = "Select"/>
-        <form:options items = "${previinlist}"/>
+        <form:options items = "${destBankList}"/>
      </form:select>
     </div>
    

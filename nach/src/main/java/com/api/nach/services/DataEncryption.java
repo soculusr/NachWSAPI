@@ -31,7 +31,7 @@ public class DataEncryption {
 	    return Files.readAllBytes(path);        
 	}
 
-	public static PublicKey readPublicKey(String filename) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+	public PublicKey readPublicKey(String filename) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		
 		byte[] keyBytes = readFileBytes(filename);

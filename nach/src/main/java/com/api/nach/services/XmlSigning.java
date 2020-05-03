@@ -38,6 +38,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -49,11 +53,19 @@ import org.xml.sax.InputSource;
 public class XmlSigning {
 	
 	
+	private static String fiUrl = "";
+	
+	@Value("${fi.url}")
+    public void setUrl(String url) {
+		fiUrl = url;
+    }
+	
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(XmlSigning.class);
 	
 	public String getSignedData(String xmlData, String KeyStoreFilePath, String KeyStorePass, String AliasName) throws IOException {
 		
 		logger.info("Keystore is "+KeyStoreFilePath);
+		logger.info("URL is"+fiUrl);
 		
 		String signedData  = null;
 		KeyInfo keyInfo = null;
