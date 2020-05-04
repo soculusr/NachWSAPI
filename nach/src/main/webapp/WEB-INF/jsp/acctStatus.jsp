@@ -38,7 +38,7 @@
 		else{ 
 		var data3 = $("input[name=accountno]").val();
 		var data4 = $("input[name=ifscno]").val();
-		var data5 = $("#previin1").val();
+		var data5 = $("#destbank1").val();
 		data.push(data3);
 		data.push(data4);
 		data.push(data5);
@@ -180,15 +180,15 @@ label {
    <div class="col" id="ifscNoCol">
     <label for="ifscno" class="mb-2 mr-sm-2">IFSC Code:</label>
     <!-- <h1>minlength="12" maxlength="12" </h1> -->
-    <input type="text" onkeypress="return onKeyAlphaNum(event)" class="form-control mb-2 mr-sm-2" placeholder="Enter ifsc code" name="ifscno" id="ifscno1" required>
+    <input oninput="this.value = this.value.toUpperCase()" style="text-transform:uppercase" type="text" onkeypress="return onKeyAlphaNum(event)" class="form-control mb-2 mr-sm-2" placeholder="Enter ifsc code" name="ifscno" id="ifscno1" required>
     <input type="hidden" class="form-control mb-2 mr-sm-2" id="ifscno" placeholder="Enter no" name="ifscno" value="1">
    </div>
    
-   <div class="col" id="previinCol"> 
+   <div class="col" id="destBankCol"> 
     <label for="previin" class="mb-2 mr-sm-2">Destination:</label>
-    <form:select required="on" style="min-width: 170%" class="form-control mb-2 mr-sm-2" id="previin1" name="previin1" path = "previinlist">
+    <form:select required="on" style="min-width: 170%" class="form-control mb-2 mr-sm-2" id="destbank1" name="destbank1" path = "destBankList">
         <form:option value = "" label = "Select"/>
-        <form:options items = "${previinlist}"/>
+        <form:options items = "${destBankList}"/>
      </form:select>
     </div>
    

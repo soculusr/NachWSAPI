@@ -10,13 +10,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.api.nach.repos.DestBankListRepository;
 import com.api.nach.repos.PrevIinListRepository;
+import com.api.nach.services.AccountReqOutService;
 
 @Controller
 public class AcctStatusReqOutController {
 	
+	/*@Autowired
+	private PrevIinListRepository prevIinRepo;*/
+	
 	@Autowired
-	private PrevIinListRepository prevIinRepo;
+	private DestBankListRepository destBankRepo;
+	
+	@Autowired
+	AccountReqOutService acctReqOutService;
 	
 	@GetMapping(value="/home3")
 	public String acctStatusDtls() {
@@ -26,15 +34,16 @@ public class AcctStatusReqOutController {
 	
 	@PostMapping("/acctStatusDtls")
 	  public void getData(@RequestBody String data) {
-		String acctStatusData = data.replace("=", "").replace("%2C", ",").replace("%2F", "/");
+		String acctStatusData = data.replace("=", "").replace("+", " ").replace("%2C", ",").replace("%2F", "/");
+		acctReqOutService.acctStatusReqOut(acctStatusData);
 		System.out.println("Status data "+acctStatusData);
 	}
 	
-	 @ModelAttribute("previinlist")
+	@ModelAttribute("destBankList")
 	   public List<String> getWebFrameworkList() {
-	      List<String> prevIinList = new ArrayList<String>();
-	      prevIinList = prevIinRepo.findAllIin();
-	      return prevIinList;
+	      List<String> destBankList = new ArrayList<String>();
+	      destBankList = destBankRepo.findAllIin();
+	      return destBankList;
 	   }
 
 }
