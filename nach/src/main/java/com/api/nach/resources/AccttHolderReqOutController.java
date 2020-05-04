@@ -10,13 +10,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.api.nach.repos.DestBankListRepository;
 import com.api.nach.repos.PrevIinListRepository;
+import com.api.nach.services.AccountReqOutService;
 
 @Controller
 public class AccttHolderReqOutController {
 	
+	/*@Autowired
+	private PrevIinListRepository prevIinRepo;*/
+	
 	@Autowired
-	private PrevIinListRepository prevIinRepo;
+	private DestBankListRepository destBankRepo;
+	
+	@Autowired
+	AccountReqOutService acctReqOutService;
 	
 	@GetMapping(value="/home2")
 	public String aadhaarDtls() {
@@ -26,15 +34,16 @@ public class AccttHolderReqOutController {
 	
 	@PostMapping("/acctHolderDtls")
 	  public void getData(@RequestBody String data) {
-		String acctHolderData = data.replace("=", "").replace("%2C", ",").replace("%2F", "/");
+		String acctHolderData = data.replace("=", "").replace("+", " ").replace("%2C", ",").replace("%2F", "/");
+		acctReqOutService.acctHolderReqOut(acctHolderData);
 		System.out.println("Holder data "+acctHolderData);
 	}
 	
-	 @ModelAttribute("previinlist")
+	@ModelAttribute("destBankList")
 	   public List<String> getWebFrameworkList() {
-	      List<String> prevIinList = new ArrayList<String>();
-	      prevIinList = prevIinRepo.findAllIin();
-	      return prevIinList;
+	      List<String> destBankList = new ArrayList<String>();
+	      destBankList = destBankRepo.findAllIin();
+	      return destBankList;
 	   }
 
 }

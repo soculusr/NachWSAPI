@@ -44,7 +44,7 @@
 		
 			data.push(data2);
 		}
-		var data3 = $("#previin1").val();
+		var data3 = $("#destbank1").val();
 		data.push(data3);
 		var finaldata  = data.toString();
 		
@@ -170,11 +170,11 @@ label {
     <input type="hidden" class="form-control mb-2 mr-sm-2" id="accountno" placeholder="Enter account no" name="accountno" value="1">
    </div>
    
-   <div class="col" id="previinCol"> 
+   <div class="col" id="destBankCol"> 
     <label for="previin" class="mb-2 mr-sm-2">Destination:</label>
-    <form:select required="on" style="min-width: 120%" class="form-control mb-2 mr-sm-2" id="previin1" name="previin1" path = "previinlist">
+    <form:select required="on" style="min-width: 120%" class="form-control mb-2 mr-sm-2" id="destbank1" name="destbank1" path = "destBankList">
         <form:option value = "" label = "Select"/>
-        <form:options items = "${previinlist}"/>
+        <form:options items = "${destBankList}"/>
      </form:select>
     </div>
    

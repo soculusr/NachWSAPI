@@ -18,8 +18,8 @@ public class PanDtlsReqOut {
 	@Id
 	@Column(name="UNIQUE_ID")
 	//@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ACCT_REQ_OUT_SEQ")
-    @SequenceGenerator(sequenceName = "ACCT_REQ_OUT_SEQ", allocationSize = 1, name = "ACCT_REQ_OUT_SEQ")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ACCT_PAN_REQ_OUT_SEQ")
+    @SequenceGenerator(sequenceName = "ACCT_REQ_OUT_SEQ", allocationSize = 1, name = "ACCT_PAN_REQ_OUT_SEQ")
 	private int panDtlsUniqueReqOutId;
 	@Column(name="service_name")
 	private String panDtlsReqOutServiceName;

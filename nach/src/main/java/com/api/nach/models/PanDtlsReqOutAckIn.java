@@ -30,6 +30,10 @@ public class PanDtlsReqOutAckIn {
 	private String panDtlsReqOutAckResData;
 	@Column(name="ACK_RESULT")
 	private String panDtlsReqOutAckRespResult;
+	@Column(name="ERROR_CODE")
+	private String panDtlsReqOutAckRespErrorCode;
+	@Column(name="REJECTED_BY")
+	private String panDtlsReqOutAckRespRejectedBy;
 	
 	
 	
@@ -85,9 +89,6 @@ public class PanDtlsReqOutAckIn {
 	public void setPanDtlsReqOutAckRespRejectedBy(String panDtlsReqOutAckRespRejectedBy) {
 		this.panDtlsReqOutAckRespRejectedBy = panDtlsReqOutAckRespRejectedBy;
 	}
-	@Column(name="ERROR_CODE")
-	private String panDtlsReqOutAckRespErrorCode;
-	@Column(name="REJECTED_BY")
-	private String panDtlsReqOutAckRespRejectedBy;
+	
 
 }
