@@ -69,7 +69,9 @@ public class AadhaarReqOutService {
 		
 		DataEncryption encryptData = new DataEncryption();
 		
-		PublicKey publicKey = encryptData.readPublicKey(publicCertificate);
+		DataEncryptDecrypt encryptDecrypt = new DataEncryptDecrypt();
+		
+		//	PublicKey publicKey = encryptData.readPublicKey(publicCertificate);
 		
 		
 		String [] dataList = request.split(",");
@@ -117,8 +119,8 @@ public class AadhaarReqOutService {
 			fixedLenghtList = Arrays.asList(listContent);
 			  
 			listOfString = new ArrayList<String>(fixedLenghtList);
-			
-			encryptedAadhaarNo= encryptData.encrypt(publicKey, listOfString.get(0).getBytes());
+			byte [] encryptedAadhaarNoData = encryptDecrypt.encryptData(publicCertificate, listOfString.get(0).getBytes());
+			encryptedAadhaarNo= Base64.getEncoder().encodeToString(encryptedAadhaarNoData);
 			aadhaarDetail = "<Detail recRefNo=\""+recRefNo+"\" aadhaar=\""+encryptedAadhaarNo+"\" mapStatus=\""+listOfString.get(1)+"\" mdFlag=\""+listOfString.get(2)+"\"  mdCustDate=\""+listOfString.get(3)+"\" odFlag=\""+listOfString.get(4)+"\" odDate=\""+listOfString.get(5)+"\" previousIIN=\""+listOfString.get(6)+"\" />\r\n";
 			aadhaarDtlsFinal.add(aadhaarDetail);
 			aadhaarDetailFinal = aadhaarDetailFinal + aadhaarDtlsFinal.get(i);
@@ -148,11 +150,10 @@ public class AadhaarReqOutService {
 		aadhaarReqDtls.setAadhaarReqData(aadhaarReq);
 		aadhaarRepository.save(aadhaarReqDtls);
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		
-		serviceName = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceName.getBytes()));
-		serviceType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceType.getBytes()));
-		sourceValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(sourceValue.getBytes()));
+		xmlDataSigned=Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		serviceName = Base64.getEncoder().encodeToString(serviceName.getBytes());
+		serviceType = Base64.getEncoder().encodeToString(serviceType.getBytes());
+		sourceValue = Base64.getEncoder().encodeToString(sourceValue.getBytes());
 		aadhaarReq="{'Source':'"+sourceValue+"','Service':'"+serviceName+"','Type':'"+serviceType+"','Message':'"+xmlDataSigned+"'}";
 	
 		//logger.info(aadhaarReq);
@@ -205,7 +206,7 @@ public class AadhaarReqOutService {
 	
 	public static String aadharSeedingResponse(String request) {
 		
-		logger.info("Inside response");
+		logger.info("Inside response"+request);
 		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

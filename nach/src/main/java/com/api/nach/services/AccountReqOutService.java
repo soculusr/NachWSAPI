@@ -92,6 +92,8 @@ public class AccountReqOutService {
 	
 	private DataEncryption encryptData = new DataEncryption();
 	
+	private DataEncryptDecrypt encryptDecrypt = new DataEncryptDecrypt();
+	
 	
 	
 	public void panDtlsReqOut(String request) {
@@ -144,13 +146,16 @@ public class AccountReqOutService {
 		destBankName = listOfString.get(0);
 		destValue = listOfString.get(1);
 		uniqueReqId = panDtlsReqOutRepository.getUniqueReqId();
-		try {
-			encryptedAcctNo = encryptData.encrypt(publicKey, dataList[0].getBytes());
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+			byte[] encryptedAcctNoData = null;
+			try {
+				encryptedAcctNoData = encryptDecrypt.encryptData(publicCertificate, dataList[0].getBytes());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			encryptedAcctNo = Base64.getEncoder().encodeToString(encryptedAcctNoData);
+		
 		logger.info("Dest bank is"+destBankName);
 		logger.info("Dest value is"+destValue);
 		logger.info("Acct no is "+dataList[0]);
@@ -182,11 +187,13 @@ public class AccountReqOutService {
 		panDtlsReqOut.setPanDtlsReqOutTimestamp(reqTimestamp);
 		panDtlsReqOut.setPanDtlsReqOutContent(panDtlsReqOutData);
 		panDtlsReqOutRepository.save(panDtlsReqOut);
+		//logger.info("xmlsigneddata "+xmlDataSigned);
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		serviceName = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceName.getBytes()));
-		serviceType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceType.getBytes()));
-		sourceValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(sourceValue.getBytes()));
+		//xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
+		xmlDataSigned=Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		serviceName = Base64.getEncoder().encodeToString(serviceName.getBytes());
+		serviceType = Base64.getEncoder().encodeToString(serviceType.getBytes());
+		sourceValue = Base64.getEncoder().encodeToString(sourceValue.getBytes());
 		panDtlsReqOutData="{'Source':'"+sourceValue+"','Service':'"+serviceName+"','Type':'"+serviceType+"','Message':'"+xmlDataSigned+"'}";
 		
 		
@@ -289,13 +296,14 @@ public class AccountReqOutService {
 		destBankName = listOfString.get(0);
 		destValue = listOfString.get(1);
 		uniqueReqId = acctHolderReqOutRepo.getUniqueReqId();
+		byte[] encryptedAcctNoData = null;
 		try {
-			encryptedAcctNo = encryptData.encrypt(publicKey, dataList[0].getBytes());
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException e) {
+			encryptedAcctNoData = encryptDecrypt.encryptData(publicCertificate, dataList[0].getBytes());
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
+		encryptedAcctNo = Base64.getEncoder().encodeToString(encryptedAcctNoData);
 		logger.info("Dest bank is"+destBankName);
 		logger.info("Dest value is"+destValue);
 		logger.info("Acct no is "+dataList[0]);
@@ -328,11 +336,10 @@ public class AccountReqOutService {
 		acctHolderReqOut.setAcctHolderReqOutContent(acctHolderReqOutData);
 		acctHolderReqOutRepo.save(acctHolderReqOut);
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		serviceName = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceName.getBytes()));
-		serviceType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceType.getBytes()));
-		sourceValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(sourceValue.getBytes()));
-		acctHolderReqOutData="{'Source':'"+sourceValue+"','Service':'"+serviceName+"','Type':'"+serviceType+"','Message':'"+xmlDataSigned+"'}";
+		xmlDataSigned=Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		serviceName = Base64.getEncoder().encodeToString(serviceName.getBytes());
+		serviceType = Base64.getEncoder().encodeToString(serviceType.getBytes());
+		sourceValue = Base64.getEncoder().encodeToString(sourceValue.getBytes());
 		
 		RestTemplate restTemplate = new RestTemplate();
 		
@@ -435,13 +442,14 @@ public class AccountReqOutService {
 		destBankName = listOfString.get(0);
 		destValue = listOfString.get(1);
 		uniqueReqId = acctStatusReqOutRepo.getUniqueReqId();
+		byte[] encryptedAcctNoData = null;
 		try {
-			encryptedAcctNo = encryptData.encrypt(publicKey, dataList[0].getBytes());
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException e) {
+			encryptedAcctNoData = encryptDecrypt.encryptData(publicCertificate, dataList[0].getBytes());
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
+		encryptedAcctNo = Base64.getEncoder().encodeToString(encryptedAcctNoData);
 		logger.info("Dest bank is"+destBankName);
 		logger.info("Dest value is"+destValue);
 		logger.info("Ifsc code is "+dataList[1]);
@@ -475,11 +483,10 @@ public class AccountReqOutService {
 		acctStatusReqOut.setAcctStatusReqOutContent(acctStatusReqOutData);
 		acctStatusReqOutRepo.save(acctStatusReqOut);
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		serviceName = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceName.getBytes()));
-		serviceType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(serviceType.getBytes()));
-		sourceValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(sourceValue.getBytes()));
-		acctStatusReqOutData="{'Source':'"+sourceValue+"','Service':'"+serviceName+"','Type':'"+serviceType+"','Message':'"+xmlDataSigned+"'}";
+		xmlDataSigned=Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		serviceName = Base64.getEncoder().encodeToString(serviceName.getBytes());
+		serviceType = Base64.getEncoder().encodeToString(serviceType.getBytes());
+		sourceValue = Base64.getEncoder().encodeToString(sourceValue.getBytes());
 		
 		RestTemplate restTemplate = new RestTemplate();
 		

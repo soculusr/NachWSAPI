@@ -107,6 +107,8 @@ public class AccountRespOutService extends Thread{
 	
 	DataEncryption encryptData = new DataEncryption();
 	
+	DataEncryptDecrypt encryptDecrypt = new DataEncryptDecrypt();
+	
 	
 	
 	
@@ -165,7 +167,7 @@ public class AccountRespOutService extends Thread{
 		String requestData = request;
 		
 		//passing public key filepath
-		PublicKey publicKey = encryptData.readPublicKey(publicCertificate);
+		//PublicKey publicKey = encryptDecrypt.readPublicKey(publicCertificate);
 		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
@@ -268,7 +270,8 @@ public class AccountRespOutService extends Thread{
 				
 				//Encryption using public key
 				byte[] panDtls = panDtlsCustPanNos.get(i).getBytes();
-				String encryptedPanDtls = encryptData.encrypt(publicKey, panDtls);
+				byte[] panDtlsData = encryptDecrypt.encryptData(publicCertificate, panDtls);
+				String encryptedPanDtls = Base64.getEncoder().encodeToString(panDtlsData);
 				//panDtlsAcctHolder = "<AccHolder pan=\""+panDtlsCustPanNos.get(i)+"\" name=\""+panDtlsCustNames.get(i)+"\" />\r\n";
 				panDtlsAcctHolder = "<AccHolder pan=\""+encryptedPanDtls+"\" name=\""+panDtlsCustNames.get(i)+"\" />\r\n";
 				panDtlsFinal.add(panDtlsAcctHolder);
@@ -314,10 +317,10 @@ public class AccountRespOutService extends Thread{
 		
 		//Base64 Conversion
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		destValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(destValue.getBytes()));
-		panDtlsService = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(panDtlsService.getBytes()));
-		resType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(resType.getBytes()));
+		xmlDataSigned = Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		destValue = Base64.getEncoder().encodeToString(destValue.getBytes());
+		panDtlsService = Base64.getEncoder().encodeToString(panDtlsService.getBytes());
+		resType = Base64.getEncoder().encodeToString(resType.getBytes());
 		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+ "'}";
 		
 		//kafkaTemplate.send(TOPIC, panDtlsResp);
@@ -511,10 +514,10 @@ public class AccountRespOutService extends Thread{
 		
 		//Base64 Conversion
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		destValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(destValue.getBytes()));
-		acctHoldrService = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(acctHoldrService.getBytes()));
-		resType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(resType.getBytes()));
+		xmlDataSigned = Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		destValue = Base64.getEncoder().encodeToString(destValue.getBytes());
+		acctHoldrService =Base64.getEncoder().encodeToString(acctHoldrService.getBytes());
+		resType = Base64.getEncoder().encodeToString(resType.getBytes());
 		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		//kafkaTemplate.send(TOPIC, acctHolderResp);
 		
@@ -664,10 +667,10 @@ public class AccountRespOutService extends Thread{
 		
 		//Base64 Conversion
 		
-		xmlDataSigned = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(xmlDataSigned.getBytes()));
-		destValue = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(destValue.getBytes()));
-		acctStatusService = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(acctHoldrService.getBytes()));
-		resType = DatatypeConverter.printBase64Binary(Base64.getEncoder().encode(resType.getBytes()));
+		xmlDataSigned = Base64.getEncoder().encodeToString(xmlDataSigned.getBytes());
+		destValue =Base64.getEncoder().encodeToString(destValue.getBytes());
+		acctStatusService =Base64.getEncoder().encodeToString(acctStatusService.getBytes());
+		resType = Base64.getEncoder().encodeToString(resType.getBytes());
 		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
 		
