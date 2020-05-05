@@ -75,7 +75,7 @@ public class AccountRespOutResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetPanDtls")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity getPanDtlsRqst(@RequestBody String acctinfo) throws Exception {
+	public ResponseEntity getPanDtlsRqst(@RequestBody String acctinfo){
 		
 		
 		//kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
@@ -89,7 +89,7 @@ public class AccountRespOutResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccHolder")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity getAcctHolderRqst(@RequestBody String acctinfo) throws Exception {
+	public ResponseEntity getAcctHolderRqst(@RequestBody String acctinfo){
 		
 		//kafkaTemplate.send(TOPIC, accountService.getAcctHolderName(acctinfo));
 		//String respData = accountService.getAcctHolderAck();
@@ -102,7 +102,7 @@ public class AccountRespOutResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccStatus")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity getAcctStatusRqst(@RequestBody String acctinfo) throws Exception {
+	public ResponseEntity getAcctStatusRqst(@RequestBody String acctinfo){
 		//kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
 		//String respData = accountService.getAcctHolderAck();
 		ResponseEntity respData = accountService.getAcctStatus(acctinfo);

@@ -1,5 +1,6 @@
 package com.api.nach.services;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.PublicKey;
@@ -134,7 +135,7 @@ public class AccountRespOutService extends Thread{
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountRespOutService.class);
 	
 	
-	public ResponseEntity getPanDtls(String request) throws Exception{
+	public ResponseEntity getPanDtls(String request){
 		
 		String currentWorkingDir = System.getProperty("user.dir");
         logger.info("Current Working Directory"+currentWorkingDir);
@@ -274,7 +275,13 @@ public class AccountRespOutService extends Thread{
 				
 				//Encryption using public key
 				byte[] panDtls = panDtlsCustPanNos.get(i).getBytes();
-				byte[] panDtlsData = encryptDecrypt.encryptData(publicCertificate, panDtls);
+				byte[] panDtlsData = null;
+				try {
+					panDtlsData = encryptDecrypt.encryptData(publicCertificate, panDtls);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					logger.error("Exception while data encryption",e);
+				}
 				String encryptedPanDtls = Base64.getEncoder().encodeToString(panDtlsData);
 				//panDtlsAcctHolder = "<AccHolder pan=\""+panDtlsCustPanNos.get(i)+"\" name=\""+panDtlsCustNames.get(i)+"\" />\r\n";
 				panDtlsAcctHolder = "<AccHolder pan=\""+encryptedPanDtls+"\" name=\""+panDtlsCustNames.get(i)+"\" />\r\n";
@@ -305,7 +312,12 @@ public class AccountRespOutService extends Thread{
 		
 		
 		//xml signing
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		try {
+			xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while signing data",e);
+		}
 		
 		
 		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+ "'}";
@@ -330,7 +342,12 @@ public class AccountRespOutService extends Thread{
 		
 		
 		//Sending original response to URL
-		sendPanDtlsResp(panDtlsResp);
+		try {
+			sendPanDtlsResp(panDtlsResp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while sendng response",e);
+		}
 		
 		
 		//Sending ack for request
@@ -349,7 +366,7 @@ public class AccountRespOutService extends Thread{
 		
 	}
 	
-	public ResponseEntity getAcctHolderName(String request) throws Exception {
+	public ResponseEntity getAcctHolderName(String request){
 		AcctHolderReqIn request2 = new AcctHolderReqIn();
 		
 		
@@ -505,7 +522,12 @@ public class AccountRespOutService extends Thread{
 				"  <NpciRefId value=\""+npciRefId+"\"/>\r\n" + 
 				"</ach:GetAccHolderResp>";
 		
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		try {
+			xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while signing data",e);
+		}
 		
 		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
@@ -527,7 +549,12 @@ public class AccountRespOutService extends Thread{
 		//kafkaTemplate.send(TOPIC, acctHolderResp);
 		
 		
-		sendAcctHolderResp(acctHolderResp);
+		try {
+			sendAcctHolderResp(acctHolderResp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while sending response",e);
+		}
 		
 		//return getAcctHolderAck(reqId);
 		return new ResponseEntity(getAcctHolderAck(reqId), HttpStatus.ACCEPTED);
@@ -542,7 +569,7 @@ public class AccountRespOutService extends Thread{
 		
 	}
 	
-	public ResponseEntity getAcctStatus(String request) throws Exception {
+	public ResponseEntity getAcctStatus(String request){
 		AcctStatusReqIn request3 = new AcctStatusReqIn();
 		AcctStatusRespOut responseAcctStatus = new AcctStatusRespOut();
 		String acctStatusService = "GetAccStatus";
@@ -661,7 +688,12 @@ public class AccountRespOutService extends Thread{
 				"</RespData>\r\n" + 
 				"</ach:GetAccStatusResp>";
 		
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		try {
+			xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while signing data",e);
+		}
 		
 		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
@@ -684,7 +716,12 @@ public class AccountRespOutService extends Thread{
 		
 		//kafkaTemplate.send(TOPIC, acctStatusResp);
 		
-		sendAcctStatusResp(acctStatusResp);
+		try {
+			sendAcctStatusResp(acctStatusResp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while sending response",e);
+		}
 		
 		//return getAcctStatusAck(reqId);
 		return new ResponseEntity(getAcctStatusAck(reqId), HttpStatus.ACCEPTED);

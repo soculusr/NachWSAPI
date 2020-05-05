@@ -27,7 +27,7 @@ public class AadhaarReqOutResource {
 	}
 	
 	@PostMapping("/AadhaarSeedingReq")
-	public void aadhaarSeedingTest(@RequestBody String request) throws Exception {
+	public void aadhaarSeedingTest(@RequestBody String request){
 		
 		
 		//kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));

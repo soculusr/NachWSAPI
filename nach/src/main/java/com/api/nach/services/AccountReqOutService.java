@@ -152,7 +152,7 @@ public class AccountReqOutService {
 				encryptedAcctNoData = encryptDecrypt.encryptData(publicCertificate, dataList[0].getBytes());
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				logger.error("Exception while encryption",e1);
 			}
 			encryptedAcctNo = Base64.getEncoder().encodeToString(encryptedAcctNoData);
 		
@@ -301,7 +301,7 @@ public class AccountReqOutService {
 			encryptedAcctNoData = encryptDecrypt.encryptData(publicCertificate, dataList[0].getBytes());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			logger.error("Exception while encryption",e1);
 		}
 		encryptedAcctNo = Base64.getEncoder().encodeToString(encryptedAcctNoData);
 		logger.info("Dest bank is"+destBankName);
@@ -447,7 +447,7 @@ public class AccountReqOutService {
 			encryptedAcctNoData = encryptDecrypt.encryptData(publicCertificate, dataList[0].getBytes());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			logger.error("Exception while encryption",e1);
 		}
 		encryptedAcctNo = Base64.getEncoder().encodeToString(encryptedAcctNoData);
 		logger.info("Dest bank is"+destBankName);

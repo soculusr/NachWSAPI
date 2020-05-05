@@ -2,6 +2,7 @@ package com.api.nach.services;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.security.PublicKey;
 import java.text.DateFormat;
@@ -15,6 +16,7 @@ import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.api.nach.models.AadhaarReqDtlsAckIn;
 import com.api.nach.models.AadhaarReqDtlsOut;
@@ -63,7 +66,7 @@ public class AadhaarReqOutService {
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountRespOutService.class);
 	
 	private XmlSigning signData = new XmlSigning();
-	public void aadharSeedingRequest(String request) throws Exception {
+	public void aadharSeedingRequest(String request){
 		
 		//String publicKeyFile = "keys" + File.separator + publicCertificate;
 		
@@ -105,7 +108,7 @@ public class AadhaarReqOutService {
 		AadhaarReqDtlsAckIn aadhaarReqDtlsAck = new AadhaarReqDtlsAckIn();
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
+		DocumentBuilder builder = null;
 		
 		recRefNo = aadhaarRepository.getRecRefNo();
 		uniqueReqId = aadhaarRepository.getUniqueReqId();
@@ -119,7 +122,13 @@ public class AadhaarReqOutService {
 			fixedLenghtList = Arrays.asList(listContent);
 			  
 			listOfString = new ArrayList<String>(fixedLenghtList);
-			byte [] encryptedAadhaarNoData = encryptDecrypt.encryptData(publicCertificate, listOfString.get(0).getBytes());
+			byte[] encryptedAadhaarNoData = null;
+			try {
+				encryptedAadhaarNoData = encryptDecrypt.encryptData(publicCertificate, listOfString.get(0).getBytes());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error("Exception while encryption",e);;
+			}
 			encryptedAadhaarNo= Base64.getEncoder().encodeToString(encryptedAadhaarNoData);
 			aadhaarDetail = "<Detail recRefNo=\""+recRefNo+"\" aadhaar=\""+encryptedAadhaarNo+"\" mapStatus=\""+listOfString.get(1)+"\" mdFlag=\""+listOfString.get(2)+"\"  mdCustDate=\""+listOfString.get(3)+"\" odFlag=\""+listOfString.get(4)+"\" odDate=\""+listOfString.get(5)+"\" previousIIN=\""+listOfString.get(6)+"\" />\r\n";
 			aadhaarDtlsFinal.add(aadhaarDetail);
@@ -138,7 +147,12 @@ public class AadhaarReqOutService {
 				"</ach:AadhaarSeedingRqst>";
 		
 		
-		xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		try {
+			xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while signing data",e);
+		}
 		
 		//logger.info("Signed aadhaar data"+xmlDataSigned);
 		
@@ -161,11 +175,23 @@ public class AadhaarReqOutService {
 		RestTemplate restTemplate = new RestTemplate();
 		
 		logger.info("url is "+npciUri);
-		SSLAuth.doTrustToCertificates();
+		//SSLAuth.doTrustToCertificates();
+		SSLHandshake.startHandshake();
 		String npciAckResponse = restTemplate.postForObject( npciUri, aadhaarReq, String.class);
 		
-		builder = factory.newDocumentBuilder();
-		Document document = builder.parse(new InputSource(new StringReader(npciAckResponse)));
+		try {
+			builder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception in building document",e);
+		}
+		Document document = null;
+		try {
+			document = builder.parse(new InputSource(new StringReader(npciAckResponse)));
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while parsing document",e);
+		}
 		
 		NodeList nListRefId = document.getElementsByTagName("NpciRefId");
 		NodeList nListResp = document.getElementsByTagName("Resp");

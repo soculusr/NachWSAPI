@@ -48,7 +48,7 @@ public class AadhaarReqOutController {
 	}
 	  
 	  @PostMapping("/aadhaarData")
-	  public String getData(@RequestBody String data) throws Exception {
+	  public String getData(@RequestBody String data){
 		  
 		  String aadhhaarData = data.replace("=", "").replace("%7E", "~").replace("%2C", ",").replace("%2F", "/").replace("+", "");
 		  

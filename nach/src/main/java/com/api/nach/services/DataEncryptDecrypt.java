@@ -137,21 +137,19 @@ public class DataEncryptDecrypt {
 		try {
 			cipher = Cipher.getInstance(ALGORITHM);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         try {
 			cipher.init(Cipher.DECRYPT_MODE, key);
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
         try {
 			decryptedBytes = cipher.doFinal(inputData);
-			//decryptedData = new String(decryptedBytes);
+			
 		} catch (IllegalBlockSizeException | BadPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
