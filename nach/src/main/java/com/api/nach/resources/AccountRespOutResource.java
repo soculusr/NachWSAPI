@@ -13,6 +13,7 @@ import javax.crypto.NoSuchPaddingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,16 +75,12 @@ public class AccountRespOutResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetPanDtls")
 	@ResponseStatus(HttpStatus.OK)
-	public String getPanDtlsRqst(@RequestBody String acctinfo) throws Exception {
+	public ResponseEntity getPanDtlsRqst(@RequestBody String acctinfo) throws Exception {
 		
 		
 		//kafkaTemplate.send(TOPIC, accountService.getPanDtls(acctinfo));
 		//String respData = accountService.getPanDtlsAck();
-		String respData = accountService.getPanDtls(acctinfo);
-		
-		
-		if(respData.equals("not found"))
-			throw new AcctNotFoundException("Account Not Found");
+		ResponseEntity respData = accountService.getPanDtls(acctinfo);
 		
 		return respData;
 	}
@@ -92,13 +89,11 @@ public class AccountRespOutResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccHolder")
 	@ResponseStatus(HttpStatus.OK)
-	public String getAcctHolderRqst(@RequestBody String acctinfo) throws Exception {
+	public ResponseEntity getAcctHolderRqst(@RequestBody String acctinfo) throws Exception {
 		
 		//kafkaTemplate.send(TOPIC, accountService.getAcctHolderName(acctinfo));
 		//String respData = accountService.getAcctHolderAck();
-		String respData = accountService.getAcctHolderName(acctinfo);
-		if(respData.equals("not found"))
-			throw new AcctNotFoundException("Account Not Found");
+		ResponseEntity respData = accountService.getAcctHolderName(acctinfo);
 		
 		return respData;
 	}
@@ -107,71 +102,13 @@ public class AccountRespOutResource {
 	@ApiResponse(responseCode = "200", description = "successful operation")
 	@PostMapping("/GetAccStatus")
 	@ResponseStatus(HttpStatus.OK)
-	public String getAcctStatusRqst(@RequestBody String acctinfo) throws Exception {
+	public ResponseEntity getAcctStatusRqst(@RequestBody String acctinfo) throws Exception {
 		//kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
 		//String respData = accountService.getAcctHolderAck();
-		String respData = accountService.getAcctStatus(acctinfo);
-		if(respData.equals("not found"))
-			throw new AcctNotFoundException("Account Not Found");
+		ResponseEntity respData = accountService.getAcctStatus(acctinfo);
 		
 		return respData;
 	}
-	
-	
-	@Operation(summary = "List All Pan Details Request", description = "It will give all request1 data from db", tags = { "GetAllRequest1" })
-	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllPanDtlsRequest")
-	public List<PanDtlsReqIn> getAllPanDtlsRequest(){
-	
-		return requestRepositoryPanDtls.findByServiceName();
-	}
-	
-	@Operation(summary = "List All Acct Holder Request", description = "It will give all request2 data from db", tags = { "GetAllRequest2" })
-	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllAcctHoldrRequest")
-	public List<AcctHolderReqIn> getAllAcctHoldrRequest(){
-	
-		return requestRepositoryAcctHoldr.findByServiceName();
-	}
-	
-	@Operation(summary = "List All Request3", description = "It will give all request3 data from db", tags = { "GetAllRequest3" })
-	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllAcctStatusRequest")
-	public List<AcctStatusReqIn> getAllAcctStatusRequest(){
-	
-		return requestRepositoryAcctStatus.findByServiceName();
-	}
-	
-	@Operation(summary = "List All Pan Details Response", description = "It will give all resposne1 data from db", tags = { "GetAllResponse1" })
-	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllPanDtlsResponse")
-	public List<PanDtlsRespOut> getAllPanDtlsResponse(){
-	
-		return responseRepositoryPanDtls.findByServiceName();
-	}
-	
-	@Operation(summary = "List All Acct Holder Response", description = "It will give all resposne2 data from db", tags = { "GetAllResponse2" })
-	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllAcctHoldrResponse")
-	public List<AcctHolderRespOut> getAllAcctHoldrResponse(){
-	
-		return responseRepositoryAcctHoldr.findByServiceName();
-	}
-	
-	@Operation(summary = "List All Acct Status Response", description = "It will give all resposne3 data from db", tags = { "GetAllResponse3" })
-	@ApiResponse(responseCode = "200", description = "successful operation")
-	@GetMapping("/GetAllResponse3")
-	public List<AcctStatusRespOut> getAllAcctStatusResponse(){
-	
-		return responseRepositoryAcctStatus.findByServiceName();
-	}
-	
-	
-	
-	
-	
-	
-	
-	
+		
 
 }

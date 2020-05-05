@@ -18,6 +18,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
@@ -84,10 +86,10 @@ public class AccountRespOutService extends Thread{
 	@Value("${keystore.alias}")
 	String KeyStoreAlias = "";
 	
-	String panDtlsService = "GetPanDtls";
-	String acctHoldrService = "GetAccHolder";
-	String acctStatusService = "GetAccStatus";
-	String resType="Response";
+	
+	
+	
+	
 	String panDtlsAcctHolder ="";
 	String panDtlsAcctHolders="";
 	String panDtlsResp="";
@@ -132,7 +134,7 @@ public class AccountRespOutService extends Thread{
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountRespOutService.class);
 	
 	
-	public String getPanDtls(String request) throws Exception{
+	public ResponseEntity getPanDtls(String request) throws Exception{
 		
 		String currentWorkingDir = System.getProperty("user.dir");
         logger.info("Current Working Directory"+currentWorkingDir);
@@ -141,6 +143,8 @@ public class AccountRespOutService extends Thread{
 		logger.info("Keystore is "+KeyStoreFilePath);
 		PanDtlsReqIn requestPanDtls = new PanDtlsReqIn();
 		PanDtlsRespOut responsePanDtls = new PanDtlsRespOut();
+		String panDtlsService = "GetPanDtls";
+		String resType="Response";
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -307,7 +311,6 @@ public class AccountRespOutService extends Thread{
 		panDtlsResp = "{'Source':'"+destValue+"','Service':'"+panDtlsService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+ "'}";
 		
 		
-		responsePanDtls.setId(requestRepositoryPanDtls.findByReqId(reqId));
 		responsePanDtls.setServicename(panDtlsService);
 		responsePanDtls.setResptimestamp(respTimestamp);
 		responsePanDtls.setRqstid(reqId);
@@ -331,26 +334,28 @@ public class AccountRespOutService extends Thread{
 		
 		
 		//Sending ack for request
-		return getPanDtlsAck(reqId);
+		//return getPanDtlsAck(reqId);
 		
 		//return panDtlsResp;
-		
+		return new ResponseEntity(getPanDtlsAck(reqId), HttpStatus.ACCEPTED);
 		
 		
 		}
 		else {
-			
-			return getPanDtlsNack(reqId);
+			return new ResponseEntity(getPanDtlsNack(reqId), HttpStatus.NOT_FOUND);
+			//return getPanDtlsNack(reqId);
 		}
 		
 		
 	}
 	
-	public String getAcctHolderName(String request) throws Exception {
+	public ResponseEntity getAcctHolderName(String request) throws Exception {
 		AcctHolderReqIn request2 = new AcctHolderReqIn();
 		
 		
-		AcctHolderRespOut response2 = new AcctHolderRespOut(); 
+		AcctHolderRespOut responseAcctHolder = new AcctHolderRespOut(); 
+		String acctHoldrService = "GetAccHolder";
+		String resType="Response";
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -504,13 +509,13 @@ public class AccountRespOutService extends Thread{
 		
 		acctHolderResp = "{'Source':'"+destValue+"','Service':'"+acctHoldrService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
-		response2.setId(requestRepositoryAcctHoldr.findByReqId(reqId));
-		response2.setServicename(acctHoldrService);
-		response2.setResptimestamp(respTimestamp);
-		response2.setRqstid(reqId);
-		response2.setNpcirefid(npciRefId);
-		response2.setRespcontent(acctHolderResp);
-		responseRepositoryAcctHoldr.save(response2);
+		
+		responseAcctHolder.setServicename(acctHoldrService);
+		responseAcctHolder.setResptimestamp(respTimestamp);
+		responseAcctHolder.setRqstid(reqId);
+		responseAcctHolder.setNpcirefid(npciRefId);
+		responseAcctHolder.setRespcontent(acctHolderResp);
+		responseRepositoryAcctHoldr.save(responseAcctHolder);
 		
 		//Base64 Conversion
 		
@@ -524,21 +529,24 @@ public class AccountRespOutService extends Thread{
 		
 		sendAcctHolderResp(acctHolderResp);
 		
-		return getAcctHolderAck(reqId);
-		
+		//return getAcctHolderAck(reqId);
+		return new ResponseEntity(getAcctHolderAck(reqId), HttpStatus.ACCEPTED);
 		
 		
 		}
 		else {
 			
-			return getAcctHolderNack(reqId);
+			//return getAcctHolderNack(reqId);
+			return new ResponseEntity(getAcctHolderNack(reqId), HttpStatus.OK);
 		}
 		
 	}
 	
-	public String getAcctStatus(String request) throws Exception {
+	public ResponseEntity getAcctStatus(String request) throws Exception {
 		AcctStatusReqIn request3 = new AcctStatusReqIn();
-		AcctStatusRespOut response3 = new AcctStatusRespOut();
+		AcctStatusRespOut responseAcctStatus = new AcctStatusRespOut();
+		String acctStatusService = "GetAccStatus";
+		String resType="Response";
 		String xmlContent = "";
 		String acctNo = "";
 		String sourceValue = "";
@@ -657,13 +665,13 @@ public class AccountRespOutService extends Thread{
 		
 		acctStatusResp = "{'Source':'"+destValue+"','Service':'"+acctStatusService+"','Type':'"+resType+"','Message':'"+xmlDataSigned+"'}";
 		
-		response3.setId(requestRepositoryAcctStatus.findByReqId(reqId));
-		response3.setServicename(acctStatusService);
-		response3.setResptimestamp(respTimestamp);
-		response3.setRqstid(reqId);
-		response3.setNpcirefid(npciRefId);
-		response3.setRespcontent(acctStatusResp);
-		responseRepositoryAcctStatus.save(response3);
+		
+		responseAcctStatus.setServicename(acctStatusService);
+		responseAcctStatus.setResptimestamp(respTimestamp);
+		responseAcctStatus.setRqstid(reqId);
+		responseAcctStatus.setNpcirefid(npciRefId);
+		responseAcctStatus.setRespcontent(acctStatusResp);
+		responseRepositoryAcctStatus.save(responseAcctStatus);
 		
 		//Base64 Conversion
 		
@@ -678,12 +686,13 @@ public class AccountRespOutService extends Thread{
 		
 		sendAcctStatusResp(acctStatusResp);
 		
-		return getAcctStatusAck(reqId);
-		
+		//return getAcctStatusAck(reqId);
+		return new ResponseEntity(getAcctStatusAck(reqId), HttpStatus.ACCEPTED);
 		//return acctStatusResp;
 		}
 		else {
-			return getAcctStatusNack(reqId);
+			//return getAcctStatusNack(reqId);
+			return new ResponseEntity(getAcctStatusNack(reqId), HttpStatus.OK);
 		}
 		
 		
@@ -844,7 +853,8 @@ public class AccountRespOutService extends Thread{
 	public void sendPanDtlsResp(String response) throws Exception{
 		
 		logger.info("In pan details");
-		SSLAuth.doTrustToCertificates();
+		//SSLAuth.doTrustToCertificates();
+		SSLHandshake.startHandshake();
 		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
 		logger.info("Ack response for panDtlsService "+ npciResponse);
 	}
@@ -852,7 +862,8 @@ public class AccountRespOutService extends Thread{
 	public void sendAcctHolderResp(String response) throws Exception {
 		
 		logger.info("In acct holder");
-		SSLAuth.doTrustToCertificates();
+		//SSLAuth.doTrustToCertificates();
+		SSLHandshake.startHandshake();
 		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
 		logger.info("Ack response for acctHolderService "+ npciResponse);
 	}
@@ -860,7 +871,8 @@ public class AccountRespOutService extends Thread{
 	public void sendAcctStatusResp(String response) throws Exception {
 		
 		logger.info("In acct status");
-		SSLAuth.doTrustToCertificates();
+		//SSLAuth.doTrustToCertificates();
+		SSLHandshake.startHandshake();
 		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
 		logger.info("Ack response for acctStatusService "+ npciResponse);
 	}

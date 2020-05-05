@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ public class AcctStatusRespOut {
 	
 	@Id
 	@Column(name="UNIQUE_ID")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ACCT_STATUS_RES_SEQ")
+    @SequenceGenerator(sequenceName = "ACCT_RES_OUT_SEQ", allocationSize = 1, name = "ACCT_STATUS_RES_SEQ")
 	private int acctStatusRespUniqueId;
 	@Column(name="SERVICE_NAME")
 	private String acctStatusRespServiceName;
