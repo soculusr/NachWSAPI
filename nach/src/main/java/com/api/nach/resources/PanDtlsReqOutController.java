@@ -26,7 +26,7 @@ public class PanDtlsReqOutController {
 	@Autowired
 	AccountReqOutService acctReqOutService;
 	
-	@GetMapping(value="/home4")
+	@GetMapping(value="/panDtlsService")
 	public String acctStatusDtls() {
 		
 		return "panDetails";

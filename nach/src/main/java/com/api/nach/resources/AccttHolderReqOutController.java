@@ -26,7 +26,7 @@ public class AccttHolderReqOutController {
 	@Autowired
 	AccountReqOutService acctReqOutService;
 	
-	@GetMapping(value="/home2")
+	@GetMapping(value="/acctHolderService")
 	public String aadhaarDtls() {
 		
 		return "acctHolder";

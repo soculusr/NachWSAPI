@@ -122,7 +122,7 @@
        </repositories>
 
 	<build>
-	<finalName>nachapi</finalName>
+	<finalName>apiGatewayListener</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

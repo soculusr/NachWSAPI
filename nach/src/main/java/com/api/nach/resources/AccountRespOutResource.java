@@ -42,7 +42,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 
 @RestController
-@RequestMapping("/nachapi")
 public class AccountRespOutResource {
 	
 	@Autowired

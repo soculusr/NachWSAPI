@@ -84,11 +84,11 @@ public class XmlSigning {
 			
 			KeyStore keystore = KeyStore.getInstance("PKCS12");
 			
-			char[] password = "nayan123".toCharArray();
+			char[] password = KeyStorePass.toCharArray();
 			
 			keystore.load(new FileInputStream(KeyStoreFilePath),password);
 			
-			String aliasName = "mykey";
+			String aliasName = AliasName;
 			Certificate cert = keystore.getCertificate(aliasName);
 			
 			Key key = keystore.getKey(aliasName, password);
@@ -101,8 +101,6 @@ public class XmlSigning {
 		
 			PrivateKey privatekey = (PrivateKey)keystore.getKey(aliasName , password);
 			
-			
-			System.out.println("Private key "+privatekey);
 			DOMSignContext domSignCtx = new DOMSignContext(privatekey, xmlDoc.getDocumentElement());
 			
 			XMLSignatureFactory xmlSigFactory = XMLSignatureFactory.getInstance("DOM");

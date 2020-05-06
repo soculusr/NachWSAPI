@@ -32,7 +32,7 @@
 			
 			$("#errmsg").html("Atleast one record should be present").show().fadeOut(2500);
 			setTimeout(function() {
-				  $(location).attr('href', 'http://localhost:8080/home2');
+				  $(location).attr('href', 'http://localhost:8080/acctHolderService');
 			  }, 2500);
 		}
 		else{ 
@@ -67,7 +67,7 @@
 		
 		$(document).ready(function() {
 			  setTimeout(function() {
-				  $(location).attr('href', 'http://localhost:8080/home2');
+				  $(location).attr('href', 'http://localhost:8080/acctHolderService');
 			  }, 3000);
 			}
 		

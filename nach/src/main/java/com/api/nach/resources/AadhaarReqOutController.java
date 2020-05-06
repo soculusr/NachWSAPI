@@ -41,21 +41,20 @@ public class AadhaarReqOutController {
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AadhaarReqOutController.class);
 	
 
-	@GetMapping(value="/home")
+	@GetMapping(value="/aadhaarService")
 	public String aadhaarDtls() {
 		
 		return "aadhaarSeeding";
 	}
 	  
 	  @PostMapping("/aadhaarData")
-	  public String getData(@RequestBody String data){
+	  public void getData(@RequestBody String data){
 		  
 		  String aadhhaarData = data.replace("=", "").replace("%7E", "~").replace("%2C", ",").replace("%2F", "/").replace("+", "");
 		  
 		  aadhaarService.aadharSeedingRequest(aadhhaarData);
-		  logger.info("Received data is "+aadhhaarData);
+		  logger.info("Received data for aadhaar is "+aadhhaarData);
 		  
-		  return "data received";
 		  
 	  }
 	  

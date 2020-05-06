@@ -26,7 +26,7 @@ public class AcctStatusReqOutController {
 	@Autowired
 	AccountReqOutService acctReqOutService;
 	
-	@GetMapping(value="/home3")
+	@GetMapping(value="/acctStatusService")
 	public String acctStatusDtls() {
 		
 		return "acctStatus";
