@@ -106,14 +106,6 @@ public class AccountReqOutService {
 		DocumentBuilder documentBuilder = null;
 		Document document = null;
 		
-		PublicKey publicKey = null;
-		
-		try {
-			publicKey = encryptData.readPublicKey(publicCertificate);
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
-			logger.error("Exception while reading public key", e);
-		}
-		
 		String [] dataList = request.split(",");
 		String [] listContent = null;
 		List<String> fixedLenghtList = null;
@@ -122,7 +114,7 @@ public class AccountReqOutService {
 		String destBankName="";
 		String sourceValue = "IBKL";
 		String sourceBankName = "IDBI Bank";
-		String serviceName = "GetPanDtlsRqst";
+		String serviceName = "GetPanDtls";
 		String serviceType = "Request";
 		String npciRefId="";
 		String encryptedAcctNo="";
@@ -256,14 +248,6 @@ public class AccountReqOutService {
 		DocumentBuilder documentBuilder = null;
 		Document document = null;
 		
-		PublicKey publicKey = null;
-		
-		try {
-			publicKey = encryptData.readPublicKey(publicCertificate);
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
-			logger.error("Exception while reading public key", e);
-		}
-		
 		String [] dataList = request.split(",");
 		String [] listContent = null;
 		List<String> fixedLenghtList = null;
@@ -340,7 +324,7 @@ public class AccountReqOutService {
 		serviceName = Base64.getEncoder().encodeToString(serviceName.getBytes());
 		serviceType = Base64.getEncoder().encodeToString(serviceType.getBytes());
 		sourceValue = Base64.getEncoder().encodeToString(sourceValue.getBytes());
-		
+		acctHolderReqOutData="{'Source':'"+sourceValue+"','Service':'"+serviceName+"','Type':'"+serviceType+"','Message':'"+xmlDataSigned+"'}";
 		RestTemplate restTemplate = new RestTemplate();
 		
 		logger.info("url is "+npciUri);
@@ -400,14 +384,6 @@ public class AccountReqOutService {
 		DocumentBuilder documentBuilder = null;
 		Document document = null;
 		
-		PublicKey publicKey = null;
-		
-		try {
-			publicKey = encryptData.readPublicKey(publicCertificate);
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
-			logger.error("Exception while reading public key", e);
-		}
-		
 		String [] dataList = request.split(",");
 		String [] listContent = null;
 		List<String> fixedLenghtList = null;
@@ -464,7 +440,7 @@ public class AccountReqOutService {
 				"			<ReqData>\r\n" + 
 				"				<Detail accNo=\""+encryptedAcctNo+"\" ifsc=\""+ifscCode+"\" />\r\n" + 
 				"			</ReqData>	\r\n" + 
-				"			<NpciRefId value=\"\" />\r\n" + 
+				"			<NpciRefId value=\"sss\" />\r\n" + 
 				"		</ach:GetAccStatusRqst>";
 		
 		try {
@@ -487,7 +463,7 @@ public class AccountReqOutService {
 		serviceName = Base64.getEncoder().encodeToString(serviceName.getBytes());
 		serviceType = Base64.getEncoder().encodeToString(serviceType.getBytes());
 		sourceValue = Base64.getEncoder().encodeToString(sourceValue.getBytes());
-		
+		acctStatusReqOutData="{'Source':'"+sourceValue+"','Service':'"+serviceName+"','Type':'"+serviceType+"','Message':'"+xmlDataSigned+"'}";
 		RestTemplate restTemplate = new RestTemplate();
 		
 		logger.info("url is "+npciUri);

@@ -160,7 +160,7 @@ public class DataEncryptDecrypt {
     
 	
 	
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		
 		//KeyPair generateKeyPair = generateKeyPair();
 		String KeyStoreFilePath = "keys" + File.separator + "nayansolanki.p12";
@@ -179,12 +179,13 @@ public class DataEncryptDecrypt {
 		}
 		String encrypted = Base64.getEncoder().encodeToString(encrypt);
 		System.out.println("Encrypt "+encrypted);
-		byte[] decrypt = decryptData(KeyStoreFilePath, Pass, alias, encrypt);
+		byte [] acctNo = Base64.getDecoder().decode(encrypted.getBytes());
+		byte[] decrypt = decryptData(KeyStoreFilePath, Pass, alias, acctNo);
 		
 		String decryptData = new String(decrypt);
 		System.out.println("Decrypted Data "+decryptData);
 		
 		
 	}
-*/
+
 }

@@ -165,15 +165,15 @@ public class AccountRespOutService extends Thread{
 		panDtlsCustNames.clear();
 		panDtlsCustPanNos.clear();
 		panDtlsFinal.clear();
-		//System.out.println("request data is" +request);
+		
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
-		String requestData = request;
-		
-		//passing public key filepath
-		//PublicKey publicKey = encryptDecrypt.readPublicKey(publicCertificate);
-		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
+		String requestData = request.substring(request.indexOf("'Message':'")+11, request.indexOf("'}"));
+		byte[] decodedBytes = Base64.getDecoder().decode(requestData);
+		String requestDataFinal = new String(decodedBytes);
+		logger.info("Final Pan Details Request Data "+requestDataFinal);
+		xmlContent = requestDataFinal.substring(requestDataFinal.indexOf("<ach:"),requestDataFinal.indexOf("</ach:GetPanDtlsRqst>")+21);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		
@@ -223,7 +223,7 @@ public class AccountRespOutService extends Thread{
 				requestPanDtls.setRqsttimestamp(reqTimestamp);
 				requestPanDtls.setRqstid(reqId);
 				requestPanDtls.setNpcirefid(npciRefId);
-				requestPanDtls.setRqstcontent(requestData);
+				requestPanDtls.setRqstcontent(requestDataFinal);
 				requestRepositoryPanDtls.save(requestPanDtls);
 				
 				
@@ -233,9 +233,15 @@ public class AccountRespOutService extends Thread{
 			logger.error("Exception", e);
 		}
 		
-		final String acctNoFinal = acctNo;
+		byte[] acctNoBytes = Base64.getDecoder().decode(acctNo);
+		logger.info("Encrypted acct no "+acctNo);
+		byte[] decryptAcctNo = DataEncryptDecrypt.decryptData(KeyStoreFilePath, KeyStorePass, KeyStoreAlias, acctNoBytes);
+		String decryptedAcctNo = new String(decryptAcctNo);
+		logger.info("Decrypted acct no "+decryptedAcctNo);
 		
-		/*Thread t1 = new Thread(new Runnable() {
+		final String acctNoFinal = decryptedAcctNo;
+		
+		Thread panDtlsThread = new Thread(new Runnable() {
 			
 			public void run() {
 				
@@ -249,14 +255,14 @@ public class AccountRespOutService extends Thread{
 				
 			}
 		});
-		t1.start();*/
+		panDtlsThread.start();
 		
 		//getDataFi(acctNo);
 		
-		fiCustNamePan.put("Nayan", "asdjkahskdjh");
-		fiCustNamePan.put("Vaibhav", "agjshdgjasgdjhgj");
-		fiCustNamePan.put("Aniket", "agjshdgjasasdgdjhgj");
-		fiMsgList.add("Account Found");
+		//fiCustNamePan.put("Nayan", "asdjkahskdjh");
+		//fiCustNamePan.put("Vaibhav", "agjshdgjasgdjhgj");
+		//fiCustNamePan.put("Aniket", "agjshdgjasasdgdjhgj");
+		//fiMsgList.add("Account Found");
 		
 		
 		if(fiMsgList.get(0).equals("Account Found")) {
@@ -279,7 +285,6 @@ public class AccountRespOutService extends Thread{
 				try {
 					panDtlsData = encryptDecrypt.encryptData(publicCertificate, panDtls);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					logger.error("Exception while data encryption",e);
 				}
 				String encryptedPanDtls = Base64.getEncoder().encodeToString(panDtlsData);
@@ -315,7 +320,6 @@ public class AccountRespOutService extends Thread{
 		try {
 			xmlDataSigned = signData.getSignedData(xmlDataUnsigned,KeyStoreFilePath, KeyStorePass, KeyStoreAlias);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			logger.error("Exception while signing data",e);
 		}
 		
@@ -345,15 +349,11 @@ public class AccountRespOutService extends Thread{
 		try {
 			sendPanDtlsResp(panDtlsResp);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			logger.error("Exception while sendng response",e);
 		}
 		
 		
-		//Sending ack for request
-		//return getPanDtlsAck(reqId);
 		
-		//return panDtlsResp;
 		return new ResponseEntity(getPanDtlsAck(reqId), HttpStatus.ACCEPTED);
 		
 		
@@ -386,11 +386,13 @@ public class AccountRespOutService extends Thread{
 		String reqTimestamp = "";
 		String xmlDataUnsigned = "";
 		String xmlDataSigned = "";
-		//System.out.println("request data is" +request);
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
-		String requestData = request;
+		String requestData = request.substring(request.indexOf("'Message':'")+11, request.indexOf("'}"));
+		byte[] decodedBytes = Base64.getDecoder().decode(requestData);
+		String requestDataFinal = new String(decodedBytes);
+		logger.info("Final Acct Holder Request Data "+requestDataFinal);
 		fiCustNameIfsc.clear();
 		acctHoldrCustName.clear();
 		acctHoldrCustNames.clear();
@@ -398,7 +400,7 @@ public class AccountRespOutService extends Thread{
 		acctHolderNames="";
 		acctHolderResp="";
 		
-		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
+		xmlContent = requestDataFinal.substring(requestDataFinal.indexOf("<ach:"),requestDataFinal.indexOf("</ach:GetAccHolderRqst>")+23);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		
@@ -448,7 +450,7 @@ public class AccountRespOutService extends Thread{
 				request2.setRqsttimestamp(reqTimestamp);
 				request2.setRqstid(reqId);
 				request2.setNpcirefid(npciRefId);
-				request2.setRqstcontent(requestData);
+				request2.setRqstcontent(requestDataFinal);
 				requestRepositoryAcctHoldr.save(request2);
 				
 			}
@@ -456,9 +458,15 @@ public class AccountRespOutService extends Thread{
 			logger.error("Exception",e);
 		}
 		
-		final String acctNoFinal = acctNo;
+		byte[] acctNoBytes = Base64.getDecoder().decode(acctNo);
+		logger.info("Encrypted acct no "+acctNo);
+		byte[] decryptAcctNo = DataEncryptDecrypt.decryptData(KeyStoreFilePath, KeyStorePass, KeyStoreAlias, acctNoBytes);
+		String decryptedAcctNo = new String(decryptAcctNo);
+		logger.info("Decrypted acct no "+decryptedAcctNo);
 		
-		/*Thread t2 = new Thread(new Runnable() {
+		final String acctNoFinal = decryptedAcctNo;
+		
+		Thread acctHolderThread = new Thread(new Runnable() {
 			
 			public void run() {
 				
@@ -472,13 +480,13 @@ public class AccountRespOutService extends Thread{
 				
 			}
 		});
-		t2.start();*/
+		acctHolderThread.start();
 		
 		//getDataFi(acctNo);
-		fiCustNameIfsc.put("Nayan", "asdjkahskdjh");
-		fiCustNameIfsc.put("Vaibhav", "agjshdgjasgdjhgj");
-		fiCustNameIfsc.put("Aniket", "agjshdgjasasdgdjhgj");
-		fiMsgList.add("Account Found");
+		//fiCustNameIfsc.put("Nayan", "asdjkahskdjh");
+		//fiCustNameIfsc.put("Vaibhav", "agjshdgjasgdjhgj");
+		//fiCustNameIfsc.put("Aniket", "agjshdgjasasdgdjhgj");
+		//fiMsgList.add("Account Found");
 		logger.info(acctHoldrCustName.toString());
 		
 		if(fiMsgList.get(0).equals("Account Found")) {
@@ -591,11 +599,14 @@ public class AccountRespOutService extends Thread{
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String respTimestamp = dateFormat.format(date);
-		String requestData = request;
+		String requestData = request.substring(request.indexOf("'Message':'")+11, request.indexOf("'}"));
+		byte[] decodedBytes = Base64.getDecoder().decode(requestData);
+		String requestDataFinal = new String(decodedBytes);
+		logger.info("Final Acct Status Request Data "+requestDataFinal);
 		acctStatusType="";
 		acctStatusResp="";
 		
-		xmlContent = requestData.substring(requestData.indexOf("<ach:"),requestData.indexOf("'}"));
+		xmlContent = requestDataFinal.substring(requestDataFinal.indexOf("<ach:"),requestDataFinal.indexOf("</ach:GetAccStatusRqst>")+23);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		//System.out.println(xmlContent);
@@ -643,17 +654,22 @@ public class AccountRespOutService extends Thread{
 				request3.setRqsttimestamp(reqTimestamp);
 				request3.setRqstid(reqId);
 				request3.setNpcirefid(npciRefId);
-				request3.setRqstcontent(requestData);
+				request3.setRqstcontent(requestDataFinal);
 				requestRepositoryAcctStatus.save(request3);
 				
 			}
 		} catch (Exception e) {
 			logger.error("Exception",e);
 		}
+		byte[] acctNoBytes = Base64.getDecoder().decode(acctNo);
+		logger.info("Encrypted acct no "+acctNo);
+		byte[] decryptAcctNo = DataEncryptDecrypt.decryptData(KeyStoreFilePath, KeyStorePass, KeyStoreAlias, acctNoBytes);
+		String decryptedAcctNo = new String(decryptAcctNo);
+		logger.info("Account no is"+decryptedAcctNo);
 		
-		final String acctNoFinal = acctNo;
+		final String acctNoFinal = decryptedAcctNo;
 		
-		/*Thread t3 = new Thread(new Runnable() {
+		Thread acctStatusThread = new Thread(new Runnable() {
 			
 			public void run() {
 				
@@ -667,12 +683,12 @@ public class AccountRespOutService extends Thread{
 				
 			}
 		});
-		t3.start();*/
+		acctStatusThread.start();
 		
 		//getDataFi(acctNo);
 		
-		acctTypeFi = "SBA";
-		fiMsgList.add("Account Found");
+		//acctTypeFi = "SBA";
+		//fiMsgList.add("Account Found");
 		if(fiMsgList.get(0).equals("Account Found")) {
 		acctStatusType = "<Account> type=\""+acctTypesFi.get(acctTypeFi)+"\" status=\"S601\" </Account>\r\n";
 		
@@ -796,7 +812,7 @@ public class AccountRespOutService extends Thread{
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
-		String ackData = "{'Source':'Demo','Service':'GetPanDtls','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+		String ackData = "{'Source':'IBKL','Service':'GetPanDtls','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
 				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
@@ -812,7 +828,7 @@ public class AccountRespOutService extends Thread{
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
-		String nackData = "{'Source':'Demo','Service':'GetPanDtls','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+		String nackData = "{'Source':'IBKL','Service':'GetPanDtls','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
 				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
@@ -828,7 +844,7 @@ public class AccountRespOutService extends Thread{
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
-		String ackData = "{'Source':'Demo','Service':'GetAccHolder','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+		String ackData = "{'Source':'IBKL','Service':'GetAccHolder','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
 				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
@@ -844,7 +860,7 @@ public class AccountRespOutService extends Thread{
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
-		String nackData = "{'Source':'Demo','Service':'GetAccHolder','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+		String nackData = "{'Source':'IBKL','Service':'GetAccHolder','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
 				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
@@ -860,7 +876,7 @@ public class AccountRespOutService extends Thread{
 	Date date = Calendar.getInstance().getTime();
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	String ackTimestamp = dateFormat.format(date);
-	String ackData = "{'Source':'Demo','Service':'GetAccStatus','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+	String ackData = "{'Source':'IBKL','Service':'GetAccStatus','Type':'Acknowledgement','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 			"<NpciRefId value=\"\"/>\r\n"+
 			"<Request id=\""+reqId+"\"/>\r\n"+
 			"<Resp ts=\""+ackTimestamp+"\" result=\"ACCEPTED\" errCode=\"\" rejectedBy=\"\" />\r\n"+
@@ -876,7 +892,7 @@ public class AccountRespOutService extends Thread{
 		Date date = Calendar.getInstance().getTime();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String ackTimestamp = dateFormat.format(date);
-		String nackData = "{'Source':'Demo','Service':'GetAccStatus','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
+		String nackData = "{'Source':'IBKL','Service':'GetAccStatus','Type':'Account Not Found Error','Message':'<nachapi:GatewayAck xmlns:nachapi=\"http://demo.nachapi.com/\">\r\n"+
 				"<NpciRefId value=\"\"/>\r\n"+
 				"<Request id=\""+reqId+"\"/>\r\n"+
 				"<Resp ts=\""+ackTimestamp+"\" result=\"ERROR\" errCode=\"404\" rejectedBy=\"\" />\r\n"+
@@ -893,7 +909,7 @@ public class AccountRespOutService extends Thread{
 		//SSLAuth.doTrustToCertificates();
 		SSLHandshake.startHandshake();
 		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
-		logger.info("Ack response for panDtlsService "+ npciResponse);
+		logger.info("Ack response for panDtlsService \n"+ npciResponse);
 	}
 	
 	public void sendAcctHolderResp(String response) throws Exception {
@@ -902,7 +918,7 @@ public class AccountRespOutService extends Thread{
 		//SSLAuth.doTrustToCertificates();
 		SSLHandshake.startHandshake();
 		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
-		logger.info("Ack response for acctHolderService "+ npciResponse);
+		logger.info("Ack response for acctHolderService \n"+ npciResponse);
 	}
 
 	public void sendAcctStatusResp(String response) throws Exception {
@@ -911,7 +927,7 @@ public class AccountRespOutService extends Thread{
 		//SSLAuth.doTrustToCertificates();
 		SSLHandshake.startHandshake();
 		String npciResponse = restTemplate.postForObject( npciUrl, response, String.class);
-		logger.info("Ack response for acctStatusService "+ npciResponse);
+		logger.info("Ack response for acctStatusService \n"+ npciResponse);
 	}
 	
 	
