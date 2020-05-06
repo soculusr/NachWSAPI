@@ -44,10 +44,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @RestController
 public class AccountRespOutResource {
 	
-	@Autowired
+	/*@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 	
-	private static final String TOPIC = "kafka_demo";
+	private static final String TOPIC = "kafka_demo";*/
 	
 	@Autowired
 	private PanDtlsReqInRepository requestRepositoryPanDtls;
@@ -72,7 +72,7 @@ public class AccountRespOutResource {
 	
 	@Operation(summary = "Pan Details Request", description = "It will give acct no and PAN details", tags = { "GetPanDtls" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@PostMapping("/GetPanDtls")
+	@PostMapping("/GetPanDtlsReq")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity getPanDtlsRqst(@RequestBody String acctinfo){
 		
@@ -86,7 +86,7 @@ public class AccountRespOutResource {
 	
 	@Operation(summary = "Account Holder Request", description = "It will give acct holder name", tags = { "GetAccHolder" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@PostMapping("/GetAccHolder")
+	@PostMapping("/GetAccHolderReq")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity getAcctHolderRqst(@RequestBody String acctinfo){
 		
@@ -99,7 +99,7 @@ public class AccountRespOutResource {
 	
 	@Operation(summary = "Account Status Request", description = "It will give status of the acct", tags = { "GetAccStatus" })
 	@ApiResponse(responseCode = "200", description = "successful operation")
-	@PostMapping("/GetAccStatus")
+	@PostMapping("/GetAccStatusReq")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity getAcctStatusRqst(@RequestBody String acctinfo){
 		//kafkaTemplate.send(TOPIC, accountService.getAcctStatus(acctinfo));
