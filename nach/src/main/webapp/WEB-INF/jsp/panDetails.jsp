@@ -107,12 +107,12 @@
 
 <style type="text/css">
 
-#idbilogo{
+/* #logo{
 
 	margin-top:1%;
 	width:150px;
 	
-}
+} */
 
 /* #aadhaarlogo{
 
@@ -159,7 +159,7 @@ label {
 
 	<div class="container" id="cd1">
 	<!-- <img src="static/images/aadhaar-logo.png" alt="logo" id="aadhaarlogo"> -->
-	<img src="static/images/idbi-bank-logo.PNG" alt="logo" id="idbilogo">
+	<!-- <img src="static/images/logo.PNG" alt="logo" id="logo"> -->
 	
   <h2 id="header">PAN Details Service</h2>
   <p>Please fill the required details below</p>

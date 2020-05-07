@@ -104,12 +104,12 @@
 
 <style type="text/css">
 
-#idbilogo{
+/* #logo{
 
 	margin-top:1%;
 	width:150px;
 	
-}
+} */
 
 /* #aadhaarlogo{
 
