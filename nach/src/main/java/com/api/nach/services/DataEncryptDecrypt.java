@@ -3,6 +3,7 @@ package com.api.nach.services;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,6 +73,28 @@ public class DataEncryptDecrypt {
         return encryptedBytes;
     }
     
+    
+    public static byte[] encryptData2( PublicKey PublicKey,byte[] inputData)
+            throws Exception {
+    	
+    	//PublicKey publicKey = PublicKey;
+		/*try {
+			publicKey = readPublicKey(PublicKeyFilePath);
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e3) {
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		}*/
+		byte[] publicKeyData = PublicKey.getEncoded();
+        PublicKey key = KeyFactory.getInstance(ALGORITHM)
+                .generatePublic(new X509EncodedKeySpec(publicKeyData));
+
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+
+        byte[] encryptedBytes = cipher.doFinal(inputData);
+        return encryptedBytes;
+    }
+    
     public static byte[] decryptData(String KeyStoreFilePath, String KeyStorePass, String KeyStoreAlias, byte[] inputData) {
     	KeyStore keystore = null;
     	String decryptedData="";
@@ -100,6 +123,21 @@ public class DataEncryptDecrypt {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		PublicKey publicKey = cert.getPublicKey();
+		byte[] encrypt=null;
+		String message = "Hello Nayan";
+		try {
+			encrypt = encryptData2(publicKey, message.getBytes());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String encrypted = Base64.getEncoder().encodeToString(encrypt);
+		System.out.println("Encrypt "+encrypted);
+		byte [] acctNo = Base64.getDecoder().decode(encrypted.getBytes());
+		
+		
 		
 		Key key = null;
 		try {
@@ -158,21 +196,55 @@ public class DataEncryptDecrypt {
     	
     }
     
+    
+    
 	
 	
 	public static void main(String[] args) {
 		
 		//KeyPair generateKeyPair = generateKeyPair();
-		String KeyStoreFilePath = "keys" + File.separator + "nayansolanki.p12";
+		String KeyStoreFilePath = "keys" + File.separator + "nayanpublic.p12";
 		
-		String PublicKeyFilePath = "keys" + File.separator + "nayanpublic.der";
-		byte[] encrypt=null;
+		String PublicKeyFilePath = "keys" + File.separator + "nayanpublic.pub";
+		byte [] pubkeybytes = null;
+		try {
+			pubkeybytes = readFileBytes(PublicKeyFilePath);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		String pubKey = null;
+		try {
+			pubKey = new String(pubkeybytes, "UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		pubKey = pubKey.replaceAll("(-+BEGIN PUBLIC KEY-+\\r?\\n|-+END PUBLIC KEY-+\\r?\\n?)","");
+		pubkeybytes = Base64.getMimeDecoder().decode(pubKey.getBytes());
+		X509EncodedKeySpec publicSpec = new X509EncodedKeySpec(pubkeybytes);
+	    KeyFactory keyFactory = null;
+		try {
+			keyFactory = KeyFactory.getInstance("RSA");
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    PublicKey pubKey2 = null;
+		try {
+			pubKey2 = keyFactory.generatePublic(publicSpec);
+		} catch (InvalidKeySpecException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+		
 		String Pass = "nayan123";
 		String alias = "nayan";
-		
+		byte[] encrypt=null;
 		String message = "Hello Nayan";
 		try {
-			encrypt = encryptData(PublicKeyFilePath, message.getBytes());
+			encrypt = encryptData2(pubKey2, message.getBytes());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
